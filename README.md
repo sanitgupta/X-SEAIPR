@@ -18,3 +18,6 @@ To run the model:
 ```
 
 If you wish to run the model for a particular state, instead of India, replace all the files (time series case data, age-wise population data, transportation data) in the Data folder.
+
+
+A more comprehensive guide coming soon!
