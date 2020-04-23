@@ -377,7 +377,8 @@ if __name__ == "__main__" :
     transportMatrix = np.loadtxt('./Data/transportMatrix.csv', delimiter=',')
     mortality = [getAgeMortality(s) for s in STATES]
     statePop  = [getStatePop(s) for s in STATES]
-    model = IndiaModel(transportMatrix, betas, statePop, mortality) 
+    data = [getData(s) for s in STATES]
+    model = IndiaModel(transportMatrix, betas, statePop, mortality, data) 
     x0 = []
     for Nbar in statePop : 
         N_ = deepcopy(Nbar)
