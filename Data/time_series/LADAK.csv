@@ -1,11 +1,4 @@
-Date,New Cases,Total Cases,Daily Recovered,Total Recovered,Daily Dead,Total Dead
-07-Mar-20,2,2,0,0,0,0
-08-Mar-20,0,2,0,0,0,0
-09-Mar-20,0,2,0,0,0,0
-10-Mar-20,0,2,0,0,0,0
-11-Mar-20,1,3,0,0,0,0
-12-Mar-20,0,3,0,0,0,0
-13-Mar-20,0,3,0,0,0,0
+Date,New Cases,Total Cases,Daily Dead,Total Dead,Daily Recovered,Total Recovered
 14-Mar-20,0,3,0,0,0,0
 15-Mar-20,0,3,0,0,0,0
 16-Mar-20,0,3,0,0,0,0
@@ -24,8 +17,8 @@ Date,New Cases,Total Cases,Daily Recovered,Total Recovered,Daily Dead,Total Dead
 29-Mar-20,0,13,0,0,0,0
 30-Mar-20,0,13,0,0,0,0
 31-Mar-20,0,13,0,0,0,0
-01-Mar-20,0,13,0,0,0,0
-02-Mar-20,0,13,0,0,0,0
+01-Apr-20,0,13,0,0,0,0
+02-Apr-20,0,13,0,0,0,0
 03-Apr-20,1,14,0,0,0,0
 04-Apr-20,0,14,0,0,0,0
 05-Apr-20,0,14,0,0,0,0
@@ -39,3 +32,6 @@ Date,New Cases,Total Cases,Daily Recovered,Total Recovered,Daily Dead,Total Dead
 13-Apr-20,2,17,0,0,0,0
 14-Apr-20,0,17,0,0,0,0
 15-Apr-20,1,18,0,0,0,0
+16-Apr-20,0,18,0,0,0,0
+17-Apr-20,0,18,0,0,0,0
+18-Apr-20,0,18,0,0,0,0
