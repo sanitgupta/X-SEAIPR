@@ -48,10 +48,15 @@ class IndiaModel () :
 
     def dx (self, x, delta_t, startDate, module=np) : 
 
+        #pdb.set_trace()
         xs = x.reshape((self.states, -1))
         derivatives = [m.dx(x, delta_t, startDate, module) for x, m in zip(xs, self.models)]
+        
+        #pdb.set_trace()
         for m in self.models : 
             m.send()
+
+        #pdb.set_trace()
 
         for i in range(self.states) : 
             _, outChannel = self.links[i]
@@ -63,10 +68,13 @@ class IndiaModel () :
                 inChannel, _ = self.links[j]
                 inChannel.append(data_)
 
+        #pdb.set_trace()
+
         for m in self.models : 
             m.receive()
+        
         #pdb.set_trace()
-        derivatives = [m.addCrossTerms(dx, module) for dx in derivatives]
+        derivatives = [m.addCrossTerms(dx, module) for m, dx in zip(self.models, derivatives)]
         dx = cat[module](derivatives)
         return dx
 
@@ -211,13 +219,13 @@ class SpaxireAgeStratified () :
         self.colors = list(zip(r,g,b))
 
     def send (self) : 
-        Q = self.s + self.e + self.a + self.i + self.r
+        # Q = self.s + self.e + self.a + self.i + self.r
 
-        sOut = Q * self.s / (self.Nbar**2)
-        eOut = Q * self.e / (self.Nbar**2) 
-        aOut = Q * self.a / (self.Nbar**2) 
-        iOut = Q * self.i / (self.Nbar**2) 
-        rOut = Q * self.r / (self.Nbar**2) 
+        sOut = self.s / self.Nbar
+        eOut = self.e / self.Nbar 
+        aOut = self.a / self.Nbar 
+        iOut = self.i / self.Nbar 
+        rOut = self.r / self.Nbar 
 
         data = {'s': sOut, 'e': eOut, 'a' : aOut, 'i' : iOut, 'r' : rOut} 
         self.outChannel.append(data)
