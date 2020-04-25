@@ -221,11 +221,11 @@ class SpaxireAgeStratified () :
     def send (self) : 
         # Q = self.s + self.e + self.a + self.i + self.r
 
-        sOut = self.s / self.Nbar
-        eOut = self.e / self.Nbar 
-        aOut = self.a / self.Nbar 
-        iOut = self.i / self.Nbar 
-        rOut = self.r / self.Nbar 
+        sOut = self.s[1] / self.Nbar[1]
+        eOut = self.e[1] / self.Nbar[1] 
+        aOut = self.a[1] / self.Nbar[1]
+        iOut = self.i[1] / self.Nbar[1]
+        rOut = self.r[1] / self.Nbar[1] 
 
         data = {'s': sOut, 'e': eOut, 'a' : aOut, 'i' : iOut, 'r' : rOut} 
         self.outChannel.append(data)
@@ -357,11 +357,11 @@ class SpaxireAgeStratified () :
     def addCrossTerms (self, dx, module=np) : 
         ds, de, da, di, dxs, dxe, dxa, dxi, dp, dr = dx.reshape((-1, self.bins))
 
-        ds  += (self.sIn  - self.sOut)
-        de  += (self.eIn  - self.eOut)
-        da  += (self.aIn  - self.aOut)
-        di  += (self.iIn  - self.iOut)
-        dr  += (self.rIn  - self.rOut)
+        ds[1]  += (self.sIn  - self.sOut)
+        de[1]  += (self.eIn  - self.eOut)
+        da[1]  += (self.aIn  - self.aOut)
+        di[1]  += (self.iIn  - self.iOut)
+        dr[1]  += (self.rIn  - self.rOut)
 
         #pdb.set_trace()
         return cat[module]((ds, de, da, di, dxs, dxe, dxa, dxi, dp, dr))
