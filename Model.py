@@ -272,8 +272,6 @@ class SpaxireAgeStratified () :
             ct = self.contactTotal(t)
             ch = self.contactHome(t)
 
-        self.Nbar = s + e + a + i + xs + xe + xa + xi + p + r
-
         b3 = 0.002 * self.lockdownLeakiness
 
         cl  = ct *  self.lockdownLeakiness     + ch * (1.0 - self.lockdownLeakiness)
