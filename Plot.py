@@ -92,9 +92,13 @@ def statePlot (series, variances, state, beginDate, step, groundTruth) :
 
 
     #### INSET GRAPH
+    groundTruthPositive = (groundTruth['Total Cases'] - groundTruth['Total Recovered'] - groundTruth['Total Dead']).to_numpy()
+    dataDate = groundTruth['Date'].iloc[0].split('-')
+    dataDate = Date(f'{dataDate[0]} {dataDate[1]}')
+    
     left, bottom, width, height = [0.17, 0.37, 0.35, 0.35]
     ax2 = fig.add_axes([left, bottom, width, height])
-    T2 = Date('14 Apr') - beginDate
+    T2 = len(groundTruthPositive) + (dataDate - beginDate)
     
     p = p[:T2]
     p_std = p_std[:T2]
@@ -106,9 +110,6 @@ def statePlot (series, variances, state, beginDate, step, groundTruth) :
     ax2.plot(np.arange(T2), symptomatics, color = colors[1], label = "Infected")
     ax2.fill_between(np.arange(T2), np.maximum(symptomatics - symptomatics_std, 0), symptomatics + symptomatics_std, facecolor = colors[1], alpha=0.2)
 
-    groundTruthPositive = (groundTruth['Total Cases'] - groundTruth['Total Recovered'] - groundTruth['Total Dead']).to_numpy()
-    dataDate = groundTruth['Date'].iloc[0].split('-')
-    dataDate = Date(f'{dataDate[0]} {dataDate[1]}')
     if (dataDate - beginDate) >= 0:
         ax2.scatter(np.arange(dataDate - beginDate, dataDate - beginDate + len(groundTruthPositive)), groundTruthPositive, c= colors[2], label = "Reported Positive")
     else:

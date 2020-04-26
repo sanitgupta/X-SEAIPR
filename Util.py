@@ -123,8 +123,8 @@ def climbFn (t, ti, tf, xi, xf) :
     if t >= tf : 
         #print("After")
         return xf
-    elif ti <= t < tf : 
-        wt = (t - ti) / (tf - ti)
+    elif (ti - 1) <= t < tf : 
+        wt = (t - (ti - 1)) / (tf - (ti - 1))
         #print("During :"+str(wt))
         return xf * wt + xi * (1 - wt)
     else : 

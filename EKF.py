@@ -50,13 +50,14 @@ def extendedKalmanFilter (updateStep, x0, P0, Q, H, R, Z, tStart, tEnd) :
     Ps = [P0]
 
     d1 = Date('27 Apr')
-    #print(tEnd.date)
+    print(str(tStart.date))
         
     for date in tqdm(DateIter(tStart, tEnd)) :
         # Time update
-        print(np.sum(xPrev))
+        if(np.size(x0) > 50):
+            print(np.sum(xPrev))
         i = date - tStart
-        xtMinus = scipy.integrate.odeint(updateStep,xPrev,[i,i+1],args=(tStart,))
+        xtMinus = scipy.integrate.odeint(updateStep,xPrev,[i,i+1],args=(tStart,),mxstep=5000)
         xtMinus = xtMinus[1]
         A = getProcessJacobians(partial(updateStep, delta_t=i, startDate=tStart), xPrev)
         m = np.shape(A)
@@ -67,8 +68,8 @@ def extendedKalmanFilter (updateStep, x0, P0, Q, H, R, Z, tStart, tEnd) :
 
         # Measurement update
         h = H(date+1)
-        r = R(date+1)
         z = Z(date+1)
+        r = R(date+1,z)
 
         if h.size > 0 : 
             K = PMinus @ h.T @ np.linalg.inv(h @ PMinus @ h.T + r)
@@ -93,7 +94,7 @@ def extendedKalmanFilter (updateStep, x0, P0, Q, H, R, Z, tStart, tEnd) :
 
         #print("EKF Date: "+str(date.date))
 
-    return np.stack(xs), Ps
+    return np.stack(xs), Ps, Q
 
 if __name__ == "__main__" : 
     print(getJacobian(sin, torch.tensor([0., 1.])))

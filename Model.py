@@ -133,9 +133,9 @@ class IndiaModel () :
                 'contactTotal'      : partial(bumpFn, ti=changeContactStart, tf=changeContactEnd, x1=contactTotal, x2=0.5*contactTotal),
                 'bins'              : 3,
                 'adultBins'         : [1],
-                'testingFraction1'  : partial(climbFn, ti=changeKt, tf=changeKt+deltaKt, xi=tf1, xf=0.8),
-                'testingFraction2'  : partial(climbFn, ti=changeKt, tf=changeKt+deltaKt, xi=tf2, xf=0.5),
-                'testingFraction3'  : partial(climbFn, ti=changeKt, tf=changeKt+deltaKt, xi=tf3, xf=0.5),
+                'testingFraction1'  : partial(climbFn, ti=changeKt, tf=changeKt+deltaKt-1, xi=tf1, xf=0.8),
+                'testingFraction2'  : partial(climbFn, ti=changeKt, tf=changeKt+deltaKt-1, xi=tf2, xf=0.5),
+                'testingFraction3'  : partial(climbFn, ti=changeKt, tf=changeKt+deltaKt-1, xi=tf3, xf=0.5),
                 'totalOut'          : self.transportMatrix[:, idx].sum(),
                 'Nbar'              : self.statePop[idx],
                 'mortality'         : self.mortality[idx]
