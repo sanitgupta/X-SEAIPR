@@ -94,7 +94,7 @@ def statePlot (series, variances, state, beginDate, step, groundTruth) :
     #### INSET GRAPH
     left, bottom, width, height = [0.17, 0.37, 0.35, 0.35]
     ax2 = fig.add_axes([left, bottom, width, height])
-    T2 = Date('14 Apr') - beginDate
+    T2 = Date('3 May') - beginDate
     
     p = p[:T2]
     p_std = p_std[:T2]

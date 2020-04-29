@@ -104,6 +104,9 @@ class IndiaModel () :
             lockdownEnd = self.lockdownEnd
 
             contactHome = np.loadtxt('./Data/home.csv', delimiter=',')
+            contactSchool = np.loadtxt('./Data/school.csv', delimiter=',')
+            contactWork = np.loadtxt('./Data/work.csv', delimiter=',')
+            contactOther = np.loadtxt('./Data/home.csv', delimiter=',')
             contactTotal = np.loadtxt('./Data/total.csv', delimiter=',')
 
             changeContactStart = Date('10 Nov')
@@ -124,7 +127,7 @@ class IndiaModel () :
                 'gamma1'            : 1/21,
                 'gamma2'            : 1/21,
                 'gamma3'            : 1/21,
-                'N'                 : 1.1e8,
+                'N'                 : self.statePop[idx],
                 'beta'              : beta,
                 'beta2'             : 0.1,
                 'f'                 : 0.2,
@@ -221,11 +224,11 @@ class SpaxireAgeStratified () :
     def send (self) : 
         # Q = self.s + self.e + self.a + self.i + self.r
 
-        sOut = self.s[1] / self.Nbar[1]
-        eOut = self.e[1] / self.Nbar[1] 
-        aOut = self.a[1] / self.Nbar[1]
-        iOut = self.i[1] / self.Nbar[1]
-        rOut = self.r[1] / self.Nbar[1] 
+        sOut = self.s[1] / self.N[1]
+        eOut = self.e[1] / self.N[1] 
+        aOut = self.a[1] / self.N[1]
+        iOut = self.i[1] / self.N[1]
+        rOut = self.r[1] / self.N[1] 
 
         data = {'s': sOut, 'e': eOut, 'a' : aOut, 'i' : iOut, 'r' : rOut} 
         self.outChannel.append(data)
@@ -271,6 +274,8 @@ class SpaxireAgeStratified () :
         else : 
             ct = self.contactTotal(t)
             ch = self.contactHome(t)
+
+        self.Nbar = s + e + a + i + xs + xe + xa + xi + p + r
 
         b3 = 0.002 * self.lockdownLeakiness
 
