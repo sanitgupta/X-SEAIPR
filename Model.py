@@ -318,8 +318,8 @@ class SpaxireAgeStratified () :
         if p.sum() > self.N.sum() * 0.02 and delta_t > Date('3 May') - startDate:
             # Make whatever changes are needed here
             ct = 0.4 * (cw + co + ch)
-            self.parentModel.transportMatrix[stateId, :] = 0.
-            self.parentModel.transportMatrix[:, stateId] = 0.
+            self.parentModel.transportMatrix[self.stateId, :] = 0.
+            self.parentModel.transportMatrix[:, self.stateId] = 0.
             self.totalOut = 0.
             self.isInHeterogenousLockdown = True
         ##################################################################################################################################

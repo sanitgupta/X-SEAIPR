@@ -54,7 +54,7 @@ def extendedKalmanFilter (updateStep, x0, P0, Q, H, R, Z, tStart, tEnd) :
         
     for date in tqdm(DateIter(tStart, tEnd)) :
         # Time update
-        print(np.sum(xPrev))
+        # print(np.sum(xPrev))
         i = date - tStart
         xtMinus = scipy.integrate.odeint(updateStep,xPrev,[i,i+1],args=(tStart,))
         xtMinus = xtMinus[1]
