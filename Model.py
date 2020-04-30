@@ -152,7 +152,7 @@ class IndiaModel () :
             inChannel, outChannel = [], []
             self.links.append((inChannel, outChannel))
 
-            self.models.append(SpaxireAgeStratified(params, inChannel, outChannel))
+            self.models.append(SpaxireAgeStratified(params, inChannel, outChannel, parentModel = self))
 
 class SpaxireAgeStratified () : 
     """
@@ -161,7 +161,7 @@ class SpaxireAgeStratified () :
     The constructor takes a dictionary
     of parameters and initializes the model.
     """
-    def __init__ (self, params, inChannel=None, outChannel=None) :
+    def __init__ (self, params, inChannel=None, outChannel=None, parentModel = None) :
         """
         ODE has a lot of parameters.
         These are present in a dictionary from
@@ -179,6 +179,7 @@ class SpaxireAgeStratified () :
             spreads aren't so easy to specify.
         """
 
+        self.parentModel = parentModel
         self.inChannel = inChannel
         self.outChannel = outChannel
 
@@ -289,7 +290,13 @@ class SpaxireAgeStratified () :
         #print("Model Date: "+str(t.date))
 
         s, e, a, i, xs, xe, xa, xi, p, r = x.reshape((-1, self.bins))
+        self.Nbar = s + e + a + i + xs + xe + xa + xi + p + r
 
+        ####################################### CHANGE PARAMETERS IF THINGS ARE NUMBER OF POSITIVES IS ABOVE A THRESHOLD ########################################
+        if p.sum() > self.Nbar.sum() * 0.002:
+            # Make whatever changes are needed here
+            print(self.parentModel.transportMatrix.shape)
+        ##################################################################################################################################
         # convert depending on usage of this function
         if module == torch : 
             ct   = torch.from_numpy(self.contactTotal(t))
@@ -300,7 +307,6 @@ class SpaxireAgeStratified () :
             ch = self.contactHome(t)
             cs = self.contactSchool
 
-        self.Nbar = s + e + a + i + xs + xe + xa + xi + p + r
 
         b3 = 0.002 * self.lockdownLeakiness
 
