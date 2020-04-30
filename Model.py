@@ -46,6 +46,10 @@ class IndiaModel () :
         d = int(d)
         return f'{d} {m}'
 
+    def setTestingFractions(self, newTestingFractions):
+        for i, place in enumerate(STATES):
+            self.models[i].setTestingFractions(newTestingFractions[place][0], newTestingFractions[place][1], newTestingFractions[place][2])
+
     def dx (self, x, delta_t, startDate, module=np) : 
 
         #pdb.set_trace()
@@ -134,6 +138,7 @@ class IndiaModel () :
                 'lockdownLeakiness' : lockdownLeakiness,
                 'contactHome'       : partial(bumpFn, ti=changeContactStart, tf=changeContactEnd, x1=contactHome, x2=0.5*contactHome),
                 'contactTotal'      : partial(bumpFn, ti=changeContactStart, tf=changeContactEnd, x1=contactTotal, x2=0.5*contactTotal),
+                'contactSchool'     : contactSchool,
                 'bins'              : 3,
                 'adultBins'         : [1],
                 'testingFraction1'  : partial(climbFn, ti=changeKt, tf=changeKt+deltaKt, xi=tf1, xf=0.8),
@@ -199,6 +204,7 @@ class SpaxireAgeStratified () :
 
         self.contactHome = params['contactHome']
         self.contactTotal = params['contactTotal']
+        self.contactSchool = params['contactSchool']
     
         self.bins = params['bins'] # Age bins
         self.Nbar = params['Nbar']
@@ -220,6 +226,23 @@ class SpaxireAgeStratified () :
         b = [random.random() for _ in range(30)]
 
         self.colors = list(zip(r,g,b))
+
+
+    def setTestingFractions(self, tf1, tf2, tf3):
+        if type(tf1) not in [int, float]:
+            self.testingFraction1 = tf1
+        else:
+            self.testingFraction1 = lambda t : tf1
+        
+        if type(tf2) not in [int, float]:
+            self.testingFraction1 = tf2
+        else:
+            self.testingFraction1 = lambda t : tf2
+        
+        if type(tf3) not in [int, float]:
+            self.testingFraction1 = tf3
+        else:
+            self.testingFraction1 = lambda t : tf3
 
     def send (self) : 
         # Q = self.s + self.e + self.a + self.i + self.r
@@ -271,16 +294,18 @@ class SpaxireAgeStratified () :
         if module == torch : 
             ct   = torch.from_numpy(self.contactTotal(t))
             ch   = torch.from_numpy(self.contactHome(t))
+            cs   = torch.from_numpy(self.contactSchool)
         else : 
             ct = self.contactTotal(t)
             ch = self.contactHome(t)
+            cs = self.contactSchool
 
         self.Nbar = s + e + a + i + xs + xe + xa + xi + p + r
 
         b3 = 0.002 * self.lockdownLeakiness
 
-        cl  = ct *  self.lockdownLeakiness     + ch * (1.0 - self.lockdownLeakiness)
-        cl2 = ct * (self.lockdownLeakiness**2) + ch * (1.0 - self.lockdownLeakiness**2) 
+        cl  = (ct - cs) *  self.lockdownLeakiness     + ch * (1.0 - self.lockdownLeakiness)
+        cl2 = (ct - cs) * (self.lockdownLeakiness**2) + ch * (1.0 - self.lockdownLeakiness**2) 
 
         # lambda for non-lockdown
         current = ct * (i + a + self.beta2*e) / self.Nbar
