@@ -113,8 +113,8 @@ class IndiaModel () :
             contactOther = np.loadtxt('./Data/home.csv', delimiter=',')
             contactTotal = np.loadtxt('./Data/total.csv', delimiter=',')
 
-            changeContactStart = Date('10 Nov')
-            changeContactEnd   = Date('11 Nov')
+            changeContactStart = self.lockdownEnd
+            changeContactEnd   = Date('1 Jul')
 
             changeKt = Date('10 Nov')
             deltaKt  = 10
@@ -122,6 +122,8 @@ class IndiaModel () :
             beta, lockdownLeakiness, tf1, tf2, tf3  = self.betas[state]
 
             params = {
+                'stateName'         : state,
+                'stateId'           : idx,
                 'tl'                : lockdownBegin, 
                 'te'                : lockdownEnd,
                 'k0'                : partial(bumpFn, ti=lockdownBegin, tf=lockdownEnd, x1=0, x2=1/7),
@@ -137,7 +139,8 @@ class IndiaModel () :
                 'f'                 : 0.2,
                 'lockdownLeakiness' : lockdownLeakiness,
                 'contactHome'       : partial(bumpFn, ti=changeContactStart, tf=changeContactEnd, x1=contactHome, x2=0.5*contactHome),
-                'contactTotal'      : partial(bumpFn, ti=changeContactStart, tf=changeContactEnd, x1=contactTotal, x2=0.5*contactTotal),
+                'contactWork'      	: partial(bumpFn, ti=changeContactStart, tf=changeContactEnd, x1=contactWork, x2=0.5*contactWork),
+                'contactOther'      : partial(bumpFn, ti=changeContactStart, tf=changeContactEnd, x1=contactOther, x2=0.5*contactOther),
                 'contactSchool'     : contactSchool,
                 'bins'              : 3,
                 'adultBins'         : [1],
@@ -183,6 +186,10 @@ class SpaxireAgeStratified () :
         self.inChannel = inChannel
         self.outChannel = outChannel
 
+        self.stateName = params['stateName']
+        self.stateId = params['stateId']
+        self.isInHeterogenousLockdown = False
+
         self.tl = params['tl']
         self.te = params['te']
 
@@ -204,7 +211,8 @@ class SpaxireAgeStratified () :
         self.lockdownLeakiness = params['lockdownLeakiness']
 
         self.contactHome = params['contactHome']
-        self.contactTotal = params['contactTotal']
+        self.contactWork = params['contactWork']
+        self.contactOther = params['contactOther']
         self.contactSchool = params['contactSchool']
     
         self.bins = params['bins'] # Age bins
@@ -292,20 +300,30 @@ class SpaxireAgeStratified () :
         s, e, a, i, xs, xe, xa, xi, p, r = x.reshape((-1, self.bins))
         self.Nbar = s + e + a + i + xs + xe + xa + xi + p + r
 
-        ####################################### CHANGE PARAMETERS IF THINGS ARE NUMBER OF POSITIVES IS ABOVE A THRESHOLD ########################################
-        if p.sum() > self.Nbar.sum() * 0.002:
-            # Make whatever changes are needed here
-            print(self.parentModel.transportMatrix.shape)
-        ##################################################################################################################################
-        # convert depending on usage of this function
+
         if module == torch : 
-            ct   = torch.from_numpy(self.contactTotal(t))
+            cw   = torch.from_numpy(self.contactWork(t))
+            co   = torch.from_numpy(self.contactOther(t))
             ch   = torch.from_numpy(self.contactHome(t))
             cs   = torch.from_numpy(self.contactSchool)
         else : 
-            ct = self.contactTotal(t)
+            cw = self.contactWork(t)
+            co = self.contactOther(t)
             ch = self.contactHome(t)
             cs = self.contactSchool
+
+        ct = cw + co + ch + cs
+
+        ####################################### CHANGE PARAMETERS IF THINGS ARE NUMBER OF POSITIVES IS ABOVE A THRESHOLD ########################################
+        if p.sum() > self.N.sum() * 0.02 and delta_t > Date('3 May') - startDate:
+            # Make whatever changes are needed here
+            ct = 0.4 * (cw + co + ch)
+            self.parentModel.transportMatrix[stateId, :] = 0.
+            self.parentModel.transportMatrix[:, stateId] = 0.
+            self.totalOut = 0.
+            self.isInHeterogenousLockdown = True
+        ##################################################################################################################################
+        # convert depending on usage of this function
 
 
         b3 = 0.002 * self.lockdownLeakiness
