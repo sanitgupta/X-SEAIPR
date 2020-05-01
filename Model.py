@@ -138,10 +138,10 @@ class IndiaModel () :
                 'beta2'             : 0.1,
                 'f'                 : 0.2,
                 'lockdownLeakiness' : lockdownLeakiness,
-                'contactHome'       : partial(bumpFn, ti=changeContactStart, tf=changeContactEnd, x1=contactHome, x2=0.5*contactHome),
+                'contactHome'       : partial(bumpFn, ti=changeContactStart, tf=changeContactEnd, x1=contactHome, x2=contactHome),
                 'contactWork'      	: partial(bumpFn, ti=changeContactStart, tf=changeContactEnd, x1=contactWork, x2=0.5*contactWork),
                 'contactOther'      : partial(bumpFn, ti=changeContactStart, tf=changeContactEnd, x1=contactOther, x2=0.5*contactOther),
-                'contactSchool'     : contactSchool,
+                'contactSchool'     : partial(stepFn, t0=lockdownBegin, x1=contactSchool, x2=np.zeros_like(contactSchool)),
                 'bins'              : 3,
                 'adultBins'         : [1],
                 'testingFraction1'  : partial(climbFn, ti=changeKt, tf=changeKt+deltaKt, xi=tf1, xf=0.8),
@@ -305,19 +305,19 @@ class SpaxireAgeStratified () :
             cw   = torch.from_numpy(self.contactWork(t))
             co   = torch.from_numpy(self.contactOther(t))
             ch   = torch.from_numpy(self.contactHome(t))
-            cs   = torch.from_numpy(self.contactSchool)
+            cs   = torch.from_numpy(self.contactSchool(t))
         else : 
             cw = self.contactWork(t)
             co = self.contactOther(t)
             ch = self.contactHome(t)
-            cs = self.contactSchool
+            cs = self.contactSchool(t)
 
         ct = cw + co + ch + cs
 
         ####################################### CHANGE PARAMETERS IF THINGS ARE NUMBER OF POSITIVES IS ABOVE A THRESHOLD ########################################
         if p.sum() > self.N.sum() * 0.02 and delta_t > Date('3 May') - startDate:
             # Make whatever changes are needed here
-            ct = 0.4 * (cw + co + ch)
+            ct = 0.4 * (cw + co) + ch
             self.parentModel.transportMatrix[self.stateId, :] = 0.
             self.parentModel.transportMatrix[:, self.stateId] = 0.
             self.totalOut = 0.
@@ -328,8 +328,8 @@ class SpaxireAgeStratified () :
 
         b3 = 0.002 * self.lockdownLeakiness
 
-        cl  = (ct - cs) *  self.lockdownLeakiness     + ch * (1.0 - self.lockdownLeakiness)
-        cl2 = (ct - cs) * (self.lockdownLeakiness**2) + ch * (1.0 - self.lockdownLeakiness**2) 
+        cl  = ct *  self.lockdownLeakiness     + ch * (1.0 - self.lockdownLeakiness)
+        cl2 = ct * (self.lockdownLeakiness**2) + ch * (1.0 - self.lockdownLeakiness**2) 
 
         # lambda for non-lockdown
         current = ct * (i + a + self.beta2*e) / self.Nbar
