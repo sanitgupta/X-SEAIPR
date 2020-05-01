@@ -132,54 +132,18 @@ if __name__ == "__main__" :
     lastSeries = []
     seriesOfVariances = []
     lastVariance = []
-    for datum, m, nbar,state in zip(data, model.models, statePop, Model.STATES) : 
-        E0 = [0, 10, 0]
-        A0 = [0, 10, 0]
-        I0 = [0, 10, 0]
-        nbar[1] -= 30
-        x0 = np.array([*(nbar.tolist()), *E0, *A0, *I0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-        ks = KalmanSimulator(datum, m, x0)
-        series, variances = ks(model.lockdownEnd - ks.startDate)
-        #pdb.set_trace()
-        seriesOfSeries.append(series[0:-1])
-        lastSeries.append(series[-1])
-        seriesOfVariances.append(variances[0:-1])
-        lastVariance.append(variances[-1])
-        Plot.statePlot(series, variances, state, ks.startDate, 3, datum, population = nbar.sum())
 
-    x0 = np.hstack(lastSeries)
-    n = x0.size
-    P0 = np.zeros((n, n))
-    for i, _ in enumerate(Model.STATES):
-        P0[30*i:30*(i+1), 30*i: 30*(i+1)] = lastVariance[i]
-    #pdb.set_trace()   
- 
-    Q = 0.1 * np.eye(n)
-    H = lambda t : np.array([])
-    R = lambda t : np.array([])
-    Z = lambda t : np.array([])
-    tStart = model.lockdownEnd
     tEnd = Date('1 Jul')
 
-    newSeries, newVariances = extendedKalmanFilter(model.dx, x0, P0, Q, H, R, Z, tStart, tEnd)
+    with open('series.pkl', 'rb') as fd : 
+        seriesOfSeries = pickle.load(fd)
 
-    newVariances = [[v[30*i:30*(i+1), 30*i: 30*(i+1)] for i, _ in enumerate(Model.STATES)] for v in newVariances]
-    newVariances = [[row[i] for row in newVariances] for i in range(len(newVariances[0]))] 
-
-    newSeries = newSeries.T.reshape((len(Model.STATES), 30, -1))
-    for i, _ in enumerate(Model.STATES) : 
-        seriesOfSeries[i] = np.vstack((seriesOfSeries[i], newSeries[i].T))
-        seriesOfVariances[i].extend(newVariances[i])
-
-    with open('series.pkl', 'wb') as fd : 
-        pickle.dump(seriesOfSeries, fd)
-
-    with open('var.pkl', 'wb') as fd : 
-        pickle.dump(seriesOfVariances, fd)
+    with open('var.pkl', 'rb') as fd : 
+        seriesOfVariances = pickle.load(fd)
 
     state_id = 1
     for m, datum, series, variance ,state, population in zip(model.models, data, seriesOfSeries, seriesOfVariances, Model.STATES, statePop) : 
-        ks = KalmanSimulator(datum, m, x0)
+        ks = KalmanSimulator(datum, m, [0] * 15)
         Plot.statePlot(series, variance, state, ks.startDate, 3, datum, population = population.sum(), threshold = 0.02)
 
         # outputting into the csv

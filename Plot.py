@@ -13,7 +13,7 @@ def gather(T, series, variances, indices):
     outputVariances = [np.sqrt(x) for x in outputVariances]
     return np.array(outputSeries), np.array(outputVariances)
 
-def statePlot (series, variances, state, beginDate, step, groundTruth,population = None) : 
+def statePlot (series, variances, state, beginDate, step, groundTruth,population = None, threshold = None) : 
     T = len(series)
     compartments = {k: [3*i, 3*i + 1, 3*i + 2] for i, k in enumerate(['S', 'E', 'A', 'I', 'Xs', 'Xe', 'Xa', 'Xi', 'P', 'R'])}
     # Define a closure function to register as a callback
@@ -72,8 +72,15 @@ def statePlot (series, variances, state, beginDate, step, groundTruth,population
     ax1.plot(np.arange(T), symptomatics, color = colors[1], label = "Infected")
     ax1.fill_between(np.arange(T), np.maximum(symptomatics - symptomatics_std, 0), symptomatics + symptomatics_std, facecolor = colors[1], alpha=0.2)
 
-    # groundTruthPositive = (groundTruth['Total Cases'] - groundTruth['Total Recovered'] - groundTruth['Total Dead']).to_numpy()
-    # ax1.scatter(np.arange(len(groundTruthPositive)), groundTruthPositive, c= colors[2], label = "Reported Positive")
+    ## Find when we go over 2% active cases and shade
+    if threshold is not None:
+        index = Date('3 May') - beginDate
+        while index < len(p) and p[index] < threshold * population:
+            index += 1
+        if index < len(p):
+            # Shade
+            ax1.fill_between(np.arange(index, T), 0, max(symptomatics + symptomatics_std) * 1.1, facecolor = colors[2], alpha=0.1)
+
     ax1.scatter(np.arange(0), [], c= colors[2], label = "Reported Positive")
 
     ax1.legend(fontsize = 20, loc="upper left")
