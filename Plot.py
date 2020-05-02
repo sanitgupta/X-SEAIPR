@@ -45,7 +45,7 @@ def statePlot (series, variances, state, beginDate, step, groundTruth) :
     
     #Plotting Standard Deviations for each state
 
-    tickLabels = list(DateIter(beginDate, beginDate + T + 30))[::step]
+    tickLabels = list(DateIter(beginDate - step, beginDate + T + 30))[::step]
     tickLabels = [d.date for d in tickLabels]
     tickLabels = ['', *tickLabels]
 
@@ -94,7 +94,7 @@ def statePlot (series, variances, state, beginDate, step, groundTruth) :
     #### INSET GRAPH
     left, bottom, width, height = [0.17, 0.37, 0.35, 0.35]
     ax2 = fig.add_axes([left, bottom, width, height])
-    T2 = Date('3 May') - beginDate
+    T2 = Date('4 May') - beginDate
     
     p = p[:T2]
     p_std = p_std[:T2]
@@ -118,7 +118,7 @@ def statePlot (series, variances, state, beginDate, step, groundTruth) :
     # ax2.set_xlabel('Time / days', fontsize=25)
     # ax2.set_ylabel('Number of people', fontsize=25)
     # ax1.set_yscale('log')
-    tickLabels = list(DateIter(beginDate, beginDate + T + 30))[::7]
+    tickLabels = list(DateIter(beginDate - step, beginDate + T + 30))[::7]
     tickLabels = [d.date for d in tickLabels]
     tickLabels = ['', *tickLabels]
     ax2.xaxis.set_major_locator(ticker.MultipleLocator(7))
