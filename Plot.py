@@ -34,7 +34,7 @@ def statePlot (series, variances, state, beginDate, step, groundTruth,population
     
     #Plotting Standard Deviations for each state
 
-    tickLabels = list(DateIter(beginDate, beginDate + T + 30))[::step]
+    tickLabels = list(DateIter(beginDate - step, beginDate + T + 30))[::step]
     tickLabels = [d.date for d in tickLabels]
     tickLabels = ['', *tickLabels]
 
@@ -127,7 +127,7 @@ def statePlot (series, variances, state, beginDate, step, groundTruth,population
     # ax2.set_xlabel('Time / days', fontsize=25)
     # ax2.set_ylabel('Number of people', fontsize=25)
     # ax1.set_yscale('log')
-    tickLabels = list(DateIter(beginDate, beginDate + T + 30))[::7]
+    tickLabels = list(DateIter(beginDate - step, beginDate + T + 30))[::7]
     tickLabels = [d.date for d in tickLabels]
     tickLabels = ['', *tickLabels]
     ax2.xaxis.set_major_locator(ticker.MultipleLocator(7))
