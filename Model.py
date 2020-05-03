@@ -315,7 +315,7 @@ class SpaxireAgeStratified () :
         ct = cw + co + ch + cs
 
         ####################################### CHANGE PARAMETERS IF THINGS ARE NUMBER OF POSITIVES IS ABOVE A THRESHOLD ########################################
-        if p.sum() > self.N.sum() * 0.02 and delta_t > Date('3 May') - startDate:
+        if p.sum() > self.N.sum() * 0.005 and delta_t > Date('3 May') - startDate:
             # Make whatever changes are needed here
             ct = 0.4 * (cw + co) + ch
             self.parentModel.transportMatrix[self.stateId, :] = 0.
