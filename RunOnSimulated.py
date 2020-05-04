@@ -159,7 +159,7 @@ if __name__ == "__main__" :
     # R = lambda t : np.array([])
     # Z = lambda t : np.array([])
     # tStart = model.lockdownEnd
-    tEnd = Date('1 Jul')
+    tEnd = Date('15 Aug')
 
     # newSeries, newVariances = extendedKalmanFilter(model.dx, x0, P0, Q, H, R, Z, tStart, tEnd)
 
@@ -182,6 +182,7 @@ if __name__ == "__main__" :
         ks = KalmanSimulator(datum, m, x0)
         Plot.statePlot(series, variance, state, ks.startDate, 7, datum, population = population.sum())
         print(state)
+        continue
 
         # outputting into the csv
         # need to estimate daily values from the timeseries of all the compartments
@@ -227,7 +228,7 @@ if __name__ == "__main__" :
 
 
         datelist = [f'{date.day}/{date.month}/2020' for date in DateIter(ks.startDate, tEnd + 1)]
-        #print(len(datelist), len(infected_active))
+        # print(len(datelist), len(infected_active))
         
         #print(len(datelist))
 
