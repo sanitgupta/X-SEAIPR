@@ -13,43 +13,40 @@ def gather(T, series, variances, indices):
     outputVariances = [np.sqrt(x) for x in outputVariances]
     return np.array(outputSeries), np.array(outputVariances)
 
-def statePlot (series, variances, state, beginDate, step, groundTruth) : 
+def statePlot (series, variances, state, beginDate, step, groundTruth,population = None, threshold = None) : 
     T = len(series)
     compartments = {k: [3*i, 3*i + 1, 3*i + 2] for i, k in enumerate(['S', 'E', 'A', 'I', 'Xs', 'Xe', 'Xa', 'Xi', 'P', 'R'])}
-    '''
-    bins = ['0-20', '20-60', '60+']
-    series = series.T.reshape((10, -1, T))
-    std = np.sqrt(variances.T.reshape((10, -1, T)))
-    fig, ax = plt.subplots(nrows=5, ncols=2, sharex=True, figsize=(20, 15))
-    fig.suptitle(state)
-    tickLabels = list(DateIter(beginDate, beginDate + T))[::step]
-    tickLabels = [d.date for d in tickLabels]
-    days = np.array([np.arange(T) for _ in range(3)])
-    for a, var, st, c in zip(collapse(ax), series, std, compartments): 
-        labels = [c + '_' + b for b in bins]
-        lines = a.plot(days.T, var.T)
-        a.legend(lines, labels)
-        for v, s, l in zip(var, st, lines) : 
-            a.fill_between(np.arange(T), np.maximum(v-s, 0), v+s, facecolor=l.get_c(), alpha=0.2)
-        a.set_xlabel('Time / days')
-        a.set_ylabel('Number of people')
-        a.set_yscale('log')
-        a.xaxis.set_major_locator(ticker.MultipleLocator(step))
-        a.set_xticklabels(tickLabels, rotation = 'vertical')
-    fig.savefig('./Plots/' + state)
-    plt.close(fig)
-    '''
+    # Define a closure function to register as a callback
+    
+    def convert_numbers_to_fraction(axis):
+        y1, y2 = axis.get_ylim()
+        rightAxis.set_ylim(100. * float(y1) / population, 100. * float(y2) / population)
+        rightAxis.figure.canvas.draw()
+
+    def convert_numbers_to_fraction2(axis):
+        y1, y2 = axis.get_ylim()
+        rightAxis2.set_ylim(100. * float(y1) / population, 100. * float(y2) / population)
+        rightAxis2.figure.canvas.draw()
+
+    def displayNumbers(x, pos):
+        if  x > 1e5: return '%1.2fM' % (x * 1e-6)
+        elif x > 1e4: return '%1.0fk' % (x * 1e-3)
+        elif x > 1e3: return '%1.1fk' % (x * 1e-3)
+        else: return str(int(x))
+    formatter = ticker.FuncFormatter(displayNumbers)
+
     colors = ['b', 'g', 'r']
     p, p_std = gather(T, series, variances, compartments['P'])
     symptomatics, symptomatics_std = gather(T, series, variances, compartments['P'] + compartments['I'] + compartments['Xi'] + compartments['A'] + compartments['Xa'])
     
     #Plotting Standard Deviations for each state
 
-    tickLabels = list(DateIter(beginDate - step, beginDate + T + 30))[::step]
+    tickLabels = list(DateIter(beginDate, beginDate + T + 30))[::step]
     tickLabels = [d.date for d in tickLabels]
     tickLabels = ['', *tickLabels]
 
     fig_std, ax3 = plt.subplots(nrows=1, ncols=1, sharex=True, figsize=(20, 10))
+    ax3.yaxis.set_major_formatter(formatter)
     fig_std.suptitle(state, fontsize=25)
 
     ax3.plot(np.arange(T), p_std, color = colors[0], label = "Standard Deviation: Tested Positive")
@@ -70,6 +67,12 @@ def statePlot (series, variances, state, beginDate, step, groundTruth) :
     #Plotting Actual State Predictions
 
     fig, ax1 = plt.subplots(nrows=1, ncols=1, sharex=True, figsize=(20, 10))
+
+    ax1.yaxis.set_major_formatter(formatter)
+    if population is not None:
+        rightAxis = ax1.twinx()
+        ax1.callbacks.connect("ylim_changed", convert_numbers_to_fraction)
+
     fig.suptitle(state, fontsize=25)
     
     ax1.plot(np.arange(T), p, color = colors[0], label = "Tested Positive")
@@ -77,24 +80,39 @@ def statePlot (series, variances, state, beginDate, step, groundTruth) :
     
     ax1.plot(np.arange(T), symptomatics, color = colors[1], label = "Infected")
     ax1.fill_between(np.arange(T), np.maximum(symptomatics - symptomatics_std, 0), symptomatics + symptomatics_std, facecolor = colors[1], alpha=0.2)
+    ## Find when we go over 2% active cases and shade
+    if threshold is not None:
+        index = Date('3 May') - beginDate
+        while index < len(p) and p[index] < threshold * population:
+            index += 1
+        if index < len(p):
+            # Shade
+            ax1.fill_between(np.arange(index, T), 0, max(symptomatics + symptomatics_std) * 1.1, facecolor = colors[2], alpha=0.1)
 
-    # groundTruthPositive = (groundTruth['Total Cases'] - groundTruth['Total Recovered'] - groundTruth['Total Dead']).to_numpy()
-    # ax1.scatter(np.arange(len(groundTruthPositive)), groundTruthPositive, c= colors[2], label = "Reported Positive")
     ax1.scatter(np.arange(0), [], c= colors[2], label = "Reported Positive")
-    
+
     ax1.legend(fontsize = 20, loc="upper left")
     ax1.set_xlabel('Time / days', fontsize=25)
     ax1.set_ylabel('Number of people', fontsize=25)
+    rightAxis.set_ylabel('Percentage of Total Population', fontsize=25)
     # ax1.set_yscale('log')
     ax1.xaxis.set_major_locator(ticker.MultipleLocator(step))
     ax1.set_xticklabels(tickLabels, rotation = 'vertical')
     ax1.tick_params(axis='both', which='major', labelsize=20)
-
+    if population is not None:
+        rightAxis.tick_params(axis='both', which='major', labelsize=20)
 
     #### INSET GRAPH
     left, bottom, width, height = [0.17, 0.37, 0.35, 0.35]
     ax2 = fig.add_axes([left, bottom, width, height])
-    T2 = Date('4 May') - beginDate
+    
+    ax2.yaxis.set_major_formatter(formatter)
+    if population is not None:
+        rightAxis2 = ax2.twinx()
+        ax2.callbacks.connect("ylim_changed", convert_numbers_to_fraction2)
+        rightAxis2.tick_params(axis='both', which='major', labelsize=20)
+
+    T2 = Date('3 May') - beginDate
     
     p = p[:T2]
     p_std = p_std[:T2]
@@ -118,7 +136,7 @@ def statePlot (series, variances, state, beginDate, step, groundTruth) :
     # ax2.set_xlabel('Time / days', fontsize=25)
     # ax2.set_ylabel('Number of people', fontsize=25)
     # ax1.set_yscale('log')
-    tickLabels = list(DateIter(beginDate - step, beginDate + T + 30))[::7]
+    tickLabels = list(DateIter(beginDate, beginDate + T + 30))[::7]
     tickLabels = [d.date for d in tickLabels]
     tickLabels = ['', *tickLabels]
     ax2.xaxis.set_major_locator(ticker.MultipleLocator(7))
