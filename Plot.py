@@ -36,18 +36,23 @@ def statePlot (series, variances, state, beginDate, step, groundTruth,population
         else: return str(int(x))
     formatter = ticker.FuncFormatter(displayNumbers)
 
+    def displayDate(y, pos):
+        return (beginDate + y).date
+    formatter_date = ticker.FuncFormatter(displayDate)
+
     colors = ['b', 'g', 'r']
     p, p_std = gather(T, series, variances, compartments['P'])
     symptomatics, symptomatics_std = gather(T, series, variances, compartments['P'] + compartments['I'] + compartments['Xi'] + compartments['A'] + compartments['Xa'])
     
     #Plotting Standard Deviations for each state
 
-    tickLabels = list(DateIter(beginDate, beginDate + T + 30))[::step]
-    tickLabels = [d.date for d in tickLabels]
-    tickLabels = ['', *tickLabels]
+    # tickLabels = list(DateIter(beginDate, beginDate + T + 30))[::step]
+    # tickLabels = [d.date for d in tickLabels]
+    # tickLabels = ['', *tickLabels]
 
     fig_std, ax3 = plt.subplots(nrows=1, ncols=1, sharex=True, figsize=(20, 10))
     ax3.yaxis.set_major_formatter(formatter)
+    ax3.xaxis.set_major_formatter(formatter_date)
     fig_std.suptitle(state, fontsize=25)
 
     ax3.plot(np.arange(T), p_std, color = colors[0], label = "Standard Deviation: Tested Positive")
@@ -58,7 +63,7 @@ def statePlot (series, variances, state, beginDate, step, groundTruth,population
     ax3.set_ylabel('Number of people', fontsize=25)
     # ax1.set_yscale('log')
     ax3.xaxis.set_major_locator(ticker.MultipleLocator(step))
-    ax3.set_xticklabels(tickLabels, rotation = 'vertical')
+    plt.xticks(rotation = 'vertical')
     ax3.tick_params(axis='both', which='major', labelsize=20)
 
     fig_std.savefig('./Plots/' + state + '_STDDEV')
@@ -68,7 +73,8 @@ def statePlot (series, variances, state, beginDate, step, groundTruth,population
     #Plotting Actual State Predictions
 
     fig, ax1 = plt.subplots(nrows=1, ncols=1, sharex=True, figsize=(20, 10))
-
+    plt.xticks(rotation = 'vertical')
+    ax1.xaxis.set_major_formatter(formatter_date)
     if population is not None:
         rightAxis = ax1.twinx()
         rightAxis.yaxis.set_major_formatter(formatter)
@@ -88,7 +94,7 @@ def statePlot (series, variances, state, beginDate, step, groundTruth,population
             index += 1
         if index < len(p):
             # Shade
-            ax1.fill_between(np.arange(index, T), 0, max(symptomatics + symptomatics_std) * 1.1, facecolor = colors[2], alpha=0.1)
+            ax1.fill_between(np.arange(index, T), 0, max(symptomatics + symptomatics_std) * 1.1 * 100./population, facecolor = colors[2], alpha=0.1)
 
     ax1.scatter(np.arange(0), [], c= colors[2], label = "Reported Positive")
 
@@ -98,7 +104,6 @@ def statePlot (series, variances, state, beginDate, step, groundTruth,population
     ax1.set_ylabel('Percentage of Total Population', fontsize=25)
     # ax1.set_yscale('log')
     ax1.xaxis.set_major_locator(ticker.MultipleLocator(step))
-    ax1.set_xticklabels(tickLabels, rotation = 'vertical')
     ax1.tick_params(axis='both', which='major', labelsize=20)
     if population is not None:
         rightAxis.tick_params(axis='both', which='major', labelsize=20)
