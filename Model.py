@@ -329,16 +329,16 @@ class SpaxireAgeStratified () :
         de = self.f * lambdaNormal * s \
                 - e * (self.k0(t) \
                     + self.gamma1 \
-                    + testFrac3 * self.gamma1 /(1 - testFrac3)) \
+                    + testFrac3) \
                 + self.mu(t) * xe 
         da = (1 - self.f) * lambdaNormal * s \
                 - a * (self.k0(t) \
                     + self.sigma \
-                    + testFrac1 * self.sigma/(1 - testFrac1)) \
+                    + testFrac1) \
                 + self.mu(t) * xa 
         di = self.sigma * a \
                 - i * (self.k0(t) \
-                    + testFrac2 * self.gamma2 / (1 - testFrac2) \
+                    + testFrac2 \
                     + self.gamma2) \
                 + self.mu(t) * xi 
         dxs = - xs * (lambdaLockdown + self.mu(t)) \
@@ -347,20 +347,20 @@ class SpaxireAgeStratified () :
                 + self.k0(t) * e \
                 - xe * (self.mu(t) \
                     + self.gamma1 \
-                    + testFrac3 * self.gamma1 /(1 - testFrac3))
+                    + testFrac3)
         dxa = (1 - self.f) * lambdaLockdown * xs \
                 - xa * (self.mu(t) \
                     + self.sigma \
-                    + testFrac1 * self.sigma/(1 - testFrac1)) \
+                    + testFrac1) \
                 + self.k0(t) * a 
         dxi = self.sigma * xa \
                 + self.k0(t) * i \
                 - xi * (self.mu(t) \
-                    + testFrac2 * self.gamma2 / (1 - testFrac2) \
+                    + testFrac2 \
                     + self.gamma2)
-        dp = testFrac2 * self.gamma2 / (1 - testFrac2) * (i + xi) \
-                + testFrac1 * self.sigma/(1 - testFrac1) * (a + xa) \
-                + testFrac3 * self.gamma1 /(1 - testFrac3) * (e + xe) \
+        dp = testFrac2 * (i + xi) \
+                + testFrac1 * (a + xa) \
+                + testFrac3* (e + xe) \
                 - self.gamma3 * p
         dr = self.gamma3 * p \
                 + self.gamma2 * (i + xi) \
