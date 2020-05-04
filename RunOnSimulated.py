@@ -178,9 +178,10 @@ if __name__ == "__main__" :
         seriesOfVariances = pickle.load(fd)
 
     state_id = 1
-    for m, datum, series, variance ,state in zip(model.models, data, seriesOfSeries, seriesOfVariances, Model.STATES) : 
+    for m, datum, series, variance ,state, population in zip(model.models, data, seriesOfSeries, seriesOfVariances, Model.STATES, statePop) : 
         ks = KalmanSimulator(datum, m, x0)
-        Plot.statePlot(series, variance, state, ks.startDate, 3, datum)
+        Plot.statePlot(series, variance, state, ks.startDate, 7, datum, population = population.sum())
+        print(state)
 
         # outputting into the csv
         # need to estimate daily values from the timeseries of all the compartments

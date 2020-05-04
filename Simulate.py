@@ -159,7 +159,7 @@ if __name__ == "__main__" :
     R = lambda t : np.array([])
     Z = lambda t : np.array([])
     tStart = model.lockdownEnd
-    tEnd = Date('1 Jul')
+    tEnd = Date('15 Aug')
 
     newSeries, newVariances = extendedKalmanFilter(model.dx, x0, P0, Q, H, R, Z, tStart, tEnd)
 
@@ -178,9 +178,9 @@ if __name__ == "__main__" :
         pickle.dump(seriesOfVariances, fd)
 
     state_id = 1
-    for m, datum, series, variance ,state in zip(model.models, data, seriesOfSeries, seriesOfVariances, Model.STATES) : 
+    for m, datum, series, variance ,state, population in zip(model.models, data, seriesOfSeries, seriesOfVariances, Model.STATES, statePop) : 
         ks = KalmanSimulator(datum, m, x0)
-        Plot.statePlot(series, variance, state, ks.startDate, 3, datum)
+        Plot.statePlot(series, variance, state, ks.startDate, 3, datum, population = population.sum())
 
         # outputting into the csv
         # need to estimate daily values from the timeseries of all the compartments
