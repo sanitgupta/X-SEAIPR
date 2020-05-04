@@ -320,8 +320,8 @@ class SpaxireAgeStratified () :
         lambdaLockdown = module.sum(self.beta * current, axis=1)
 
         # testing rates for presymptomatics, symptomatics and asymptomatics respectively
-        testFrac1 = 3 * self.testingFraction1(t)/8
-        testFrac2 = (5/3) * (testFrac1/(1-testFrac1))
+        testFrac1 = 3 * self.testingFraction1(t) / 8
+        testFrac2 = 5 * testingFraction1(t) / (8 - 3 * testingFraction1(t))
         testFrac3 = self.testingFraction3(t)
 
 

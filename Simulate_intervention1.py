@@ -158,14 +158,14 @@ if __name__ == "__main__" :
         assert state in newTestingFractions.keys(), "State code is inccorect: " + state
         newTestingFractions[state] = \
             [lambda x: climbFn(x, increaseTestingStartDate, increaseTestingEndDate, stateTestingFraction, 0.5 * keralaTestingFraction) \
-                if keralaTestingFraction > 0.5 * stateTestingFraction else stateTestingFraction \
+                if 0.5 * keralaTestingFraction > stateTestingFraction else stateTestingFraction \
                 for stateTestingFraction, keralaTestingFraction in zip(oldTestingFractions[state], keralaTestingFraction)]
     
     for state in bottomStates:
         assert state in newTestingFractions.keys(), "State code is inccorect: " + state
         newTestingFractions[state] = \
             [lambda x: climbFn(x, increaseTestingStartDate, increaseTestingEndDate, stateTestingFraction, 0.25 * keralaTestingFraction) \
-                if keralaTestingFraction > 0.25 * stateTestingFraction else stateTestingFraction \
+                if 0.25 * keralaTestingFraction > stateTestingFraction else stateTestingFraction \
                 for stateTestingFraction, keralaTestingFraction in zip(oldTestingFractions[state], keralaTestingFraction)]
     #########################################################################################################################################################
 
