@@ -133,7 +133,7 @@ if __name__ == "__main__" :
     seriesOfVariances = []
     lastVariance = []
 
-    tEnd = Date('1 Jul')
+    tEnd = Date('15 Aug')
 
     with open('series.pkl', 'rb') as fd : 
         seriesOfSeries = pickle.load(fd)
