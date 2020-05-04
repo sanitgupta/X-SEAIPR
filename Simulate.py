@@ -145,7 +145,7 @@ if __name__ == "__main__" :
         lastSeries.append(series[-1])
         seriesOfVariances.append(variances[0:-1])
         lastVariance.append(variances[-1])
-        Plot.statePlot(series, variances, state, ks.startDate, 3, datum, population = nbar.sum())
+        Plot.statePlot(series, variances, state, ks.startDate, 7, datum, population = nbar.sum())
 
     x0 = np.hstack(lastSeries)
     n = x0.size
@@ -180,7 +180,7 @@ if __name__ == "__main__" :
     state_id = 1
     for m, datum, series, variance ,state, population in zip(model.models, data, seriesOfSeries, seriesOfVariances, Model.STATES, statePop) : 
         ks = KalmanSimulator(datum, m, x0)
-        Plot.statePlot(series, variance, state, ks.startDate, 3, datum, population = population.sum(), threshold = 0.02)
+        Plot.statePlot(series, variance, state, ks.startDate, 7, datum, population = population.sum(), threshold = 0.01)
 
         # outputting into the csv
         # need to estimate daily values from the timeseries of all the compartments

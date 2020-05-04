@@ -144,7 +144,9 @@ if __name__ == "__main__" :
     state_id = 1
     for m, datum, series, variance ,state, population in zip(model.models, data, seriesOfSeries, seriesOfVariances, Model.STATES, statePop) : 
         ks = KalmanSimulator(datum, m, [0] * 15)
-        Plot.statePlot(series, variance, state, ks.startDate, 3, datum, population = population.sum(), threshold = 0.02)
+        Plot.statePlot(series, variance, state, ks.startDate, 7, datum, population = population.sum(), threshold = 0.02)
+        print(state)
+        continue
 
         # outputting into the csv
         # need to estimate daily values from the timeseries of all the compartments
