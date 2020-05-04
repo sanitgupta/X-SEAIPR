@@ -142,8 +142,8 @@ if __name__ == "__main__" :
     topStates = ["MIZORAM","KERALA","PUNJAB","TAMILNADU","GUJARAT","HIMACHALPRADESH","LAKSHADWEEP","MAHARASHTRA","KARNATAKA","ANDHRAPRADESH","WESTBENGAL","JAMMU&KASHMIR","LADAK"]
     midStates = ["TELANGANA", "CHANDIGARH", "MANIPUR", "MEGHALAYA", "SIKKIM", "CHHATTISGARH", "ARUNACHALPRADESH", "GOA", "NCTOFDELHI", "JHARKHAND", "HARYANA", "ANDAMAN&NICOBAR", "PUDUCHERRY"]
     bottomStates = ["TRIPURA", "UTTARAKHAND", "ASSAM", "NAGALAND", "DAMAN&DIU", "MADHYAPRADESH", "ODISHA", "BIHAR", "RAJASTHAN", "DADRA&NAGARHAVELI", "UTTARPRADESH"]
-    increaseTestingStartDate = Date('26 Apr')
-    increaseTestingEndDate = Date('3 May')
+    increaseTestingStartDate = Date('3 May')
+    increaseTestingEndDate = Date('10 May')
 
     keralaTestingFraction = oldTestingFractions['KERALA']
     newTestingFractions = oldTestingFractions
