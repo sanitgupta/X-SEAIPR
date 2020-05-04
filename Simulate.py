@@ -145,7 +145,7 @@ if __name__ == "__main__" :
         lastSeries.append(series[-1])
         seriesOfVariances.append(variances[0:-1])
         lastVariance.append(variances[-1])
-        Plot.statePlot(series, variances, state, ks.startDate, 7, datum)
+        Plot.statePlot(series, variances, state, ks.startDate, 7, datum, population = nbar.sum())
 
     x0 = np.hstack(lastSeries)
     n = x0.size
