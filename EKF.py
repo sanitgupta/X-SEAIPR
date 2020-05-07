@@ -6,7 +6,7 @@ from Util import *
 from Model import *
 from Simulate import *
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import scipy.linalg
 import scipy.integrate
 import pdb
