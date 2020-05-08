@@ -28,6 +28,12 @@ class DateIter () :
     def __len__ (self) : 
         return self.end - self.start
 
+def getAllPlaces(directory = "Data/time_series/"):
+    ignore = set(["TOTAL"])
+    allPlaces = [x.replace(".csv", "").strip().upper() for x in os.listdir(directory)]
+    allPlaces = [x for x in allPlaces if x not in ignore]
+    return allPlaces
+
 class Date () : 
 
     MONTHS = ['Jan', 'Feb', 'Mar', 
