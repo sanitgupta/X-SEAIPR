@@ -118,7 +118,7 @@ def statePlot (series, variances, state, beginDate, step, groundTruth,population
         ax2.callbacks.connect("ylim_changed", convert_fraction_to_number2)
         rightAxis2.tick_params(axis='both', which='major', labelsize=20)
 
-    T2 = Date('3 May') - beginDate
+    T2 = Date('4 May') - beginDate
     
     p = p[:T2]
     p_std = p_std[:T2]
