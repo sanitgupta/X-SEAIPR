@@ -315,8 +315,8 @@ class SpaxireAgeStratified () :
         ct = cw + co + ch + cs
 
         ####################################### CHANGE PARAMETERS IF THINGS ARE NUMBER OF POSITIVES IS ABOVE A THRESHOLD ########################################
-        threhold = 0.005
-        if p.sum() > self.N.sum() * threhold and delta_t > Date('3 May') - startDate:
+        threshold = 0.0001
+        if p.sum() > self.N.sum() * threshold and delta_t > Date('3 May') - startDate:
             # Make whatever changes are needed here
             ct = 0.4 * (cw + co) + ch
             if not self.isInHeterogenousLockdown:
@@ -328,7 +328,7 @@ class SpaxireAgeStratified () :
             self.totalOut = 0.            
             self.isInHeterogenousLockdown = True
 
-        elif self.isInHeterogenousLockdown and p.sum() < self.N.sum() * threhold:
+        elif self.isInHeterogenousLockdown and p.sum() < self.N.sum() * threshold:
             self.isInHeterogenousLockdown = False
             self.parentModel.transportMatrix[self.stateId, :] = self.originalTransportMatrixRow
             self.parentModel.transportMatrix[:, self.stateId] = self.originalTransportMatrixCol
