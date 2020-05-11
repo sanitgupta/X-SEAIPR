@@ -121,8 +121,10 @@ class KalmanSimulator () :
         return series, variances
 
 if __name__ == "__main__" : 
+
     with open('./Data/beta.json') as fd : 
         betas = json.load(fd)
+    print(betas)
     transportMatrix = np.loadtxt('./Data/transportMatrix.csv', delimiter=',')
     statePop  = [getStatePop(s) for s in Model.STATES]
     mortality = [0.01 * getAgeMortality(s) for s in Model.STATES]

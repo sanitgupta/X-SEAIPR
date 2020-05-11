@@ -1,4 +1,3 @@
-# 1b
 from Util import *
 import json
 import random
@@ -28,6 +27,9 @@ STATES = ['ANDAMAN&NICOBAR','ANDHRAPRADESH','ARUNACHALPRADESH',
         'PUDUCHERRY','PUNJAB','RAJASTHAN',
         'SIKKIM','TAMILNADU','TELANGANA',
         'TRIPURA','UTTARPRADESH','UTTARAKHAND','WESTBENGAL']
+
+# STATES = getAllPlaces()
+# STATES.sort()
 
 class IndiaModel () : 
 

@@ -150,27 +150,27 @@ if __name__ == "__main__" :
     for state in topStates:
         assert state in newTestingFractions.keys(), "State code is inccorect: " + state
         newTestingFractions[state] = \
-            [lambda x: climbFn(x, increaseTestingStartDate, increaseTestingEndDate, stateTestingFraction, 1.0 * keralaTestingFraction) \
+            [partial(climbFn, ti=increaseTestingStartDate, tf=increaseTestingEndDate, xi=stateTestingFraction, xf=keralaTestingFraction) \
                 if keralaTestingFraction > stateTestingFraction else stateTestingFraction \
                 for stateTestingFraction, keralaTestingFraction in zip(oldTestingFractions[state], keralaTestingFraction)]
-    
+
     for state in midStates:
         assert state in newTestingFractions.keys(), "State code is inccorect: " + state
         newTestingFractions[state] = \
-            [lambda x: climbFn(x, increaseTestingStartDate, increaseTestingEndDate, stateTestingFraction, 0.5 * keralaTestingFraction) \
+            [partial(climbFn, ti=increaseTestingStartDate, tf=increaseTestingEndDate, xi=stateTestingFraction, xf=0.5 * keralaTestingFraction) \
                 if 0.5 * keralaTestingFraction > stateTestingFraction else stateTestingFraction \
                 for stateTestingFraction, keralaTestingFraction in zip(oldTestingFractions[state], keralaTestingFraction)]
     
     for state in bottomStates:
         assert state in newTestingFractions.keys(), "State code is inccorect: " + state
         newTestingFractions[state] = \
-            [lambda x: climbFn(x, increaseTestingStartDate, increaseTestingEndDate, stateTestingFraction, 0.25 * keralaTestingFraction) \
+            [partial(climbFn, ti=increaseTestingStartDate, tf=increaseTestingEndDate, xi=stateTestingFraction, xf=0.25 * keralaTestingFraction) \
                 if 0.25 * keralaTestingFraction > stateTestingFraction else stateTestingFraction \
                 for stateTestingFraction, keralaTestingFraction in zip(oldTestingFractions[state], keralaTestingFraction)]
     #########################################################################################################################################################
 
     model = Model.IndiaModel(transportMatrix, betas, statePop, mortality, data)
-    model.setTestingFractions(newTestingFractions) 
+    #model.setTestingFractions(newTestingFractions) 
     seriesOfSeries = []
     lastSeries = []
     seriesOfVariances = []

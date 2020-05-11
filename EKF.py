@@ -6,24 +6,33 @@ from Util import *
 from Model import *
 from Simulate import *
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import scipy.linalg
 import scipy.integrate
 import pdb
 import numdifftools as nd
+import multiprocessing as mp
+
+class Grad () : 
+    
+    def __init__ (self, f, x): 
+        self.f = f
+        self.x = x
+        self.eta = 1e-2
+        self.n = np.size(x)
+
+    def __call__ (self, i) :
+        dx = np.zeros(self.n)
+        dx[i] = self.eta
+        df = (self.f(self.x + dx) - self.f(self.x)) / self.eta
+        return df
 
 def getProcessJacobians(f, x):
     n = np.size(x)
-    eta = 1e-2
-    for i in range(0,n):
-        dx = np.zeros(n)
-        dx[i] = eta
-        df = (f(x + dx) - f(x))/eta
-
-        if i == 0:
-            jac = df
-        else:
-            jac = np.vstack((jac,df))
+    g = Grad(f, x)
+    with mp.Pool() as p : 
+        grads = p.map(g, range(n))
+    jac = np.vstack(grads)
     return jac.T
 
 def sin(x) :
