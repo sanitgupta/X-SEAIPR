@@ -90,6 +90,10 @@ class IndiaModel () :
         dx = self.dx(x, t, module)
         return x + dx
 
+    def recomputeTotalOuts(self):
+        for idx, model in enumerate(self.models):
+            model.totalOut = self.transportMatrix[:, idx].sum(),
+
     def setStateModels (self):
         self.models = []
         self.links = []
@@ -329,14 +333,14 @@ class SpaxireAgeStratified () :
                 self.originalTotalOut = self.totalOut
             self.parentModel.transportMatrix[self.stateId, :] = 0.
             self.parentModel.transportMatrix[:, self.stateId] = 0.
-            self.totalOut = 0.            
+            self.parentModel.recomputeTotalOuts()          
             self.isInHeterogenousLockdown = True
 
         elif self.isInHeterogenousLockdown and p.sum() < self.N.sum() * threshold:
             self.isInHeterogenousLockdown = False
             self.parentModel.transportMatrix[self.stateId, :] = self.originalTransportMatrixRow
             self.parentModel.transportMatrix[:, self.stateId] = self.originalTransportMatrixCol
-            self.totalOut = self.originalTotalOut
+            self.parentModel.recomputeTotalOuts()          
         ##################################################################################################################################
         # convert depending on usage of this function
 
