@@ -121,6 +121,7 @@ class KalmanSimulator () :
         return series, variances
 
 if __name__ == "__main__" : 
+
     with open('./Data/beta.json') as fd : 
         betas = json.load(fd)
     transportMatrix = np.loadtxt('./Data/transportMatrix.csv', delimiter=',')
@@ -180,7 +181,7 @@ if __name__ == "__main__" :
     state_id = 1
     for m, datum, series, variance ,state, population in zip(model.models, data, seriesOfSeries, seriesOfVariances, Model.STATES, statePop) : 
         ks = KalmanSimulator(datum, m, x0)
-        Plot.statePlot(series, variance, state, ks.startDate, 7, datum, population = population.sum(), threshold = 0.0001)
+        Plot.statePlot(series, variance, state, ks.startDate, 7, datum, population = population.sum())
 
         # outputting into the csv
         # need to estimate daily values from the timeseries of all the compartments

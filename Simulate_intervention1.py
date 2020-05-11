@@ -142,35 +142,35 @@ if __name__ == "__main__" :
     topStates = ["MIZORAM","KERALA","PUNJAB","TAMILNADU","GUJARAT","HIMACHALPRADESH","LAKSHADWEEP","MAHARASHTRA","KARNATAKA","ANDHRAPRADESH","WESTBENGAL","JAMMU&KASHMIR","LADAK"]
     midStates = ["TELANGANA", "CHANDIGARH", "MANIPUR", "MEGHALAYA", "SIKKIM", "CHHATTISGARH", "ARUNACHALPRADESH", "GOA", "NCTOFDELHI", "JHARKHAND", "HARYANA", "ANDAMAN&NICOBAR", "PUDUCHERRY"]
     bottomStates = ["TRIPURA", "UTTARAKHAND", "ASSAM", "NAGALAND", "DAMAN&DIU", "MADHYAPRADESH", "ODISHA", "BIHAR", "RAJASTHAN", "DADRA&NAGARHAVELI", "UTTARPRADESH"]
-    increaseTestingStartDate = Date('26 Apr')
-    increaseTestingEndDate = Date('3 May')
+    increaseTestingStartDate = Date('3 May')
+    increaseTestingEndDate = Date('10 May')
 
     keralaTestingFraction = oldTestingFractions['KERALA']
     newTestingFractions = oldTestingFractions
     for state in topStates:
         assert state in newTestingFractions.keys(), "State code is inccorect: " + state
         newTestingFractions[state] = \
-            [lambda x: climbFn(x, increaseTestingStartDate, increaseTestingEndDate, stateTestingFraction, 1.0 * keralaTestingFraction) \
+            [partial(climbFn, ti=increaseTestingStartDate, tf=increaseTestingEndDate, xi=stateTestingFraction, xf=keralaTestingFraction) \
                 if keralaTestingFraction > stateTestingFraction else stateTestingFraction \
                 for stateTestingFraction, keralaTestingFraction in zip(oldTestingFractions[state], keralaTestingFraction)]
-    
+
     for state in midStates:
         assert state in newTestingFractions.keys(), "State code is inccorect: " + state
         newTestingFractions[state] = \
-            [lambda x: climbFn(x, increaseTestingStartDate, increaseTestingEndDate, stateTestingFraction, 0.5 * keralaTestingFraction) \
-                if keralaTestingFraction > stateTestingFraction else stateTestingFraction \
+            [partial(climbFn, ti=increaseTestingStartDate, tf=increaseTestingEndDate, xi=stateTestingFraction, xf=0.5 * keralaTestingFraction) \
+                if 0.5 * keralaTestingFraction > stateTestingFraction else stateTestingFraction \
                 for stateTestingFraction, keralaTestingFraction in zip(oldTestingFractions[state], keralaTestingFraction)]
     
     for state in bottomStates:
         assert state in newTestingFractions.keys(), "State code is inccorect: " + state
         newTestingFractions[state] = \
-            [lambda x: climbFn(x, increaseTestingStartDate, increaseTestingEndDate, stateTestingFraction, 0.25 * keralaTestingFraction) \
-                if keralaTestingFraction > stateTestingFraction else stateTestingFraction \
+            [partial(climbFn, ti=increaseTestingStartDate, tf=increaseTestingEndDate, xi=stateTestingFraction, xf=0.25 * keralaTestingFraction) \
+                if 0.25 * keralaTestingFraction > stateTestingFraction else stateTestingFraction \
                 for stateTestingFraction, keralaTestingFraction in zip(oldTestingFractions[state], keralaTestingFraction)]
     #########################################################################################################################################################
 
     model = Model.IndiaModel(transportMatrix, betas, statePop, mortality, data)
-    model.setTestingFractions(newTestingFractions) 
+    #model.setTestingFractions(newTestingFractions) 
     seriesOfSeries = []
     lastSeries = []
     seriesOfVariances = []
@@ -188,7 +188,7 @@ if __name__ == "__main__" :
         lastSeries.append(series[-1])
         seriesOfVariances.append(variances[0:-1])
         lastVariance.append(variances[-1])
-        Plot.statePlot(series, variances, state, ks.startDate, 3, datum)
+        Plot.statePlot(series, variances, state, ks.startDate, 7, datum, population = nbar.sum())
 
     x0 = np.hstack(lastSeries)
     n = x0.size
@@ -202,7 +202,7 @@ if __name__ == "__main__" :
     R = lambda t : np.array([])
     Z = lambda t : np.array([])
     tStart = model.lockdownEnd
-    tEnd = Date('1 Jul')
+    tEnd = Date('15 Aug')
 
     newSeries, newVariances = extendedKalmanFilter(model.dx, x0, P0, Q, H, R, Z, tStart, tEnd)
 
@@ -221,9 +221,9 @@ if __name__ == "__main__" :
         pickle.dump(seriesOfVariances, fd)
 
     state_id = 1
-    for m, datum, series, variance ,state in zip(model.models, data, seriesOfSeries, seriesOfVariances, Model.STATES) : 
+    for m, datum, series, variance ,state, population in zip(model.models, data, seriesOfSeries, seriesOfVariances, Model.STATES, statePop) : 
         ks = KalmanSimulator(datum, m, x0)
-        Plot.statePlot(series, variance, state, ks.startDate, 3, datum)
+        Plot.statePlot(series, variance, state, ks.startDate, 7, datum, population = population.sum())
 
         # outputting into the csv
         # need to estimate daily values from the timeseries of all the compartments

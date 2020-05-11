@@ -1,4 +1,3 @@
-# 1b
 from Util import *
 import json
 import random
@@ -7,7 +6,9 @@ from more_itertools import collapse
 from itertools import product
 from functools import partial
 import torch
-import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')
+from matplotlib import pyplot
 import numpy as np
 from Simulate import *
 from copy import deepcopy
@@ -28,6 +29,9 @@ STATES = ['ANDAMAN&NICOBAR','ANDHRAPRADESH','ARUNACHALPRADESH',
         'PUDUCHERRY','PUNJAB','RAJASTHAN',
         'SIKKIM','TAMILNADU','TELANGANA',
         'TRIPURA','UTTARPRADESH','UTTARAKHAND','WESTBENGAL']
+
+# STATES = getAllPlaces()
+# STATES.sort()
 
 class IndiaModel () : 
 
