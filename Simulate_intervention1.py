@@ -170,7 +170,7 @@ if __name__ == "__main__" :
     #########################################################################################################################################################
 
     model = Model.IndiaModel(transportMatrix, betas, statePop, mortality, data)
-    #model.setTestingFractions(newTestingFractions) 
+    model.setTestingFractions(newTestingFractions) 
     seriesOfSeries = []
     lastSeries = []
     seriesOfVariances = []
