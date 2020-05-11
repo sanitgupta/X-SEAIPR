@@ -234,18 +234,17 @@ class SpaxireAgeStratified () :
         if type(tf1) not in [int, float]:
             self.testingFraction1 = tf1
         else:
-            print(tf1)
-            self.testingFraction1 = tf1
+            self.testingFraction1 = partial(constFn, x = tf1)
         
         if type(tf2) not in [int, float]:
             self.testingFraction1 = tf2
         else:
-            self.testingFraction1 = tf2
+            self.testingFraction1 = partial(constFn, x = tf2)
         
         if type(tf3) not in [int, float]:
             self.testingFraction1 = tf3
         else:
-            self.testingFraction1 = tf3
+            self.testingFraction1 = partial(constFn, x = tf3)
 
     def send (self) : 
         # Q = self.s + self.e + self.a + self.i + self.r
@@ -325,7 +324,7 @@ class SpaxireAgeStratified () :
 
         #print("**********************************************")
         # testing rates for presymptomatics, symptomatics and asymptomatics respectively
-        print(self.testingFraction1)
+        #print(self.testingFraction1)
         testFrac1 = 3 * self.testingFraction1(t) / 8
         testFrac2 = 5 * self.testingFraction1(t) / (8 - 3 * self.testingFraction1(t))
         testFrac3 = self.testingFraction3(t)
