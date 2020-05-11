@@ -36,7 +36,7 @@ STATES = ['ANDAMAN&NICOBAR','ANDHRAPRADESH','ARUNACHALPRADESH',
 class IndiaModel () : 
 
     def __init__ (self, transportMatrix, betas, statePop, mortality, data) : 
-        self.transportMatrix = transportMatrix
+        self.transportMatrix = transportMatrix * 0.5
         self.betas = betas
         self.statePop = statePop
         self.bins = 3
@@ -92,7 +92,7 @@ class IndiaModel () :
 
     def recomputeTotalOuts(self):
         for idx, model in enumerate(self.models):
-            model.totalOut = self.transportMatrix[:, idx].sum(),
+            model.totalOut = self.transportMatrix[:, idx].sum()
 
     def setStateModels (self):
         self.models = []
@@ -122,7 +122,7 @@ class IndiaModel () :
             contactTotal = np.loadtxt('./Data/total.csv', delimiter=',')
 
             changeContactStart = self.lockdownEnd
-            changeContactEnd   = Date('1 Jul')
+            changeContactEnd   = Date('15 Aug')
 
             changeKt = Date('10 Nov')
             deltaKt  = 10
