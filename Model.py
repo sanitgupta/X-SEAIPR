@@ -234,17 +234,18 @@ class SpaxireAgeStratified () :
         if type(tf1) not in [int, float]:
             self.testingFraction1 = tf1
         else:
-            self.testingFraction1 = lambda t : tf1
+            print(tf1)
+            self.testingFraction1 = tf1
         
         if type(tf2) not in [int, float]:
             self.testingFraction1 = tf2
         else:
-            self.testingFraction1 = lambda t : tf2
+            self.testingFraction1 = tf2
         
         if type(tf3) not in [int, float]:
             self.testingFraction1 = tf3
         else:
-            self.testingFraction1 = lambda t : tf3
+            self.testingFraction1 = tf3
 
     def send (self) : 
         # Q = self.s + self.e + self.a + self.i + self.r
@@ -321,7 +322,10 @@ class SpaxireAgeStratified () :
         current[self.adultBins] += cl[self.adultBins, :] * b3 * p / self.Nbar[self.adultBins]
         lambdaLockdown = module.sum(self.beta * current, axis=1)
 
+
+        #print("**********************************************")
         # testing rates for presymptomatics, symptomatics and asymptomatics respectively
+        print(self.testingFraction1)
         testFrac1 = 3 * self.testingFraction1(t) / 8
         testFrac2 = 5 * self.testingFraction1(t) / (8 - 3 * self.testingFraction1(t))
         testFrac3 = self.testingFraction3(t)
