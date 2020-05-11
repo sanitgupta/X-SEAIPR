@@ -125,6 +125,9 @@ def sortAndFlattenDict(d) :
 def dictProduct (d) : 
     return map(dict, product(*map(lambda x : product([x[0]], x[1]), d.items())))
 
+def constFn(t, x):
+    return x
+
 def climbFn (t, ti, tf, xi, xf) : 
     if t >= tf : 
         #print("After")
