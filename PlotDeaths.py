@@ -152,10 +152,25 @@ def getDeaths(dataDir, plot_start_date = Date('14 Mar')):
         ks = KalmanSimulator(datum, m, x0)
         total_population += population.sum()
         allPopulations.append(population.sum())
-        # outputting into the csv
-        # need to estimate daily values from the timeseries of all the compartments
+        
+        # recovered_total = np.sum(series[:, 27:30], axis = 1)
+        recovered_total = series[:, 27:30]
+        recovered_daily = np.zeros_like(recovered_total)
+        recovered_daily[0, :] = recovered_total[0, :]
+        for i in range(1, len(recovered_total)):
+            recovered_daily[i, :] = recovered_total[i, :] - recovered_total[i - 1, :]
+        
+        # also has E + XE for now because they go into recovered too
+        # infected_active = np.sum(series[:, 3:6] + series[:, 15:18] + series[:, 6:9] + series[:, 9:12] + series[:, 18:21] + series[:, 21:24] + series[:, 24:27], axis = 1)
+        infected_active = series[:, 3:6] + series[:, 15:18] + series[:, 6:9] + series[:, 9:12] + series[:, 18:21] + series[:, 21:24] + series[:, 24:27]
+        
+        infected_daily = np.zeros_like(infected_active)
+        infected_daily[0, :] = infected_active[0, :]
+        for i in range(1, len(infected_daily)):
+            infected_daily[i, :] = infected_active[i, :] - infected_active[i - 1, :]
+        infected_daily = infected_daily + recovered_daily
 
-        deads_daily = np.sum(getAgeMortality(state) * 0.01 * (series[:, 9:12] + series[:, 21:24] + series[:, 24:27]), axis = 1)
+        deads_daily = np.sum(getAgeMortality(state) * 0.01 * infected_daily, axis = 1)
         # deads_daily = deads_daily[:-17]
         deads_daily = np.concatenate([np.zeros(17), deads_daily])
         deads_total = np.cumsum(deads_daily)
