@@ -170,7 +170,7 @@ if __name__ == "__main__" :
     #########################################################################################################################################################
 
     model = Model.IndiaModel(transportMatrix, betas, statePop, mortality, data)
-    #model.setTestingFractions(newTestingFractions) 
+    model.setTestingFractions(newTestingFractions) 
     seriesOfSeries = []
     lastSeries = []
     seriesOfVariances = []
@@ -245,7 +245,7 @@ if __name__ == "__main__" :
         # if excluding E,Xe, can't compute infected_daily perfectly must settle with a 0.8 factor
         # infected_active = np.sum(series[:, 6:9] + series[:, 9:12] + series[:, 18:21] + series[:, 21:24] + series[:, 24:27], axis = 1)
         infected_daily = np.insert(np.diff(infected_active), 0 , infected_active[0])
-        infected_daily = infected_daily + recovered_daily + deads_daily
+        infected_daily = infected_daily + recovered_daily
 
         #print(deads_daily.shape, recovered_total.shape, recovered_daily.shape, infected_daily.shape)
         
