@@ -6,13 +6,13 @@ from more_itertools import collapse
 from itertools import product
 from functools import partial
 import torch
-import matplotlib
-matplotlib.use('Agg')
-from matplotlib import pyplot as plt
+# import matplotlib
+# matplotlib.use('Agg')
+# from matplotlib import pyplot as plt
 import numpy as np
 from Simulate import *
 from copy import deepcopy
-from Plot import * 
+# from Plot import * 
 import pdb
 
 cat = {np : np.hstack, torch : torch.cat}

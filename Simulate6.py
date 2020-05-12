@@ -1,6 +1,6 @@
 from Util import *
 import pickle
-import Plot
+# import Plot
 from EKF import *
 import json
 import Model
@@ -180,34 +180,34 @@ if __name__ == "__main__" :
     with open('var.pkl', 'wb') as fd : 
         pickle.dump(seriesOfVariances, fd)
 
-    state_id = 1
-    for m, datum, series, variance ,state, population in zip(model.models, data, seriesOfSeries, seriesOfVariances, Model.STATES, statePop) : 
-        ks = KalmanSimulator(datum, m, x0)
-        Plot.statePlot(series, variance, state, ks.startDate, 7, datum, population = population.sum())
+    # state_id = 1
+    # for m, datum, series, variance ,state, population in zip(model.models, data, seriesOfSeries, seriesOfVariances, Model.STATES, statePop) : 
+    #     ks = KalmanSimulator(datum, m, x0)
+    #     Plot.statePlot(series, variance, state, ks.startDate, 7, datum, population = population.sum())
 
-        # outputting into the csv
-        # need to estimate daily values from the timeseries of all the compartments
+    #     # outputting into the csv
+    #     # need to estimate daily values from the timeseries of all the compartments
 
-        deads_daily = np.sum(getAgeMortality(state) * 0.01 * (series[:, 9:12] + series[:, 21:24] + series[:, 24:27]), axis = 1)
-        deads_daily = deads_daily[:-17]
-        deads_daily = np.concatenate([np.zeros(17), deads_daily])
-        deads_total = np.cumsum(deads_daily)
+    #     deads_daily = np.sum(getAgeMortality(state) * 0.01 * (series[:, 9:12] + series[:, 21:24] + series[:, 24:27]), axis = 1)
+    #     deads_daily = deads_daily[:-17]
+    #     deads_daily = np.concatenate([np.zeros(17), deads_daily])
+    #     deads_total = np.cumsum(deads_daily)
 
-        recovered_total = np.sum(series[:, 27:30], axis = 1)
-        recovered_daily = np.insert(np.diff(recovered_total), 0 , recovered_total[0])
-        recovered_daily = recovered_daily - deads_daily
-        recovered_total = np.cumsum(recovered_daily)
+    #     recovered_total = np.sum(series[:, 27:30], axis = 1)
+    #     recovered_daily = np.insert(np.diff(recovered_total), 0 , recovered_total[0])
+    #     recovered_daily = recovered_daily - deads_daily
+    #     recovered_total = np.cumsum(recovered_daily)
 
         
-        # also has E + XE for now because they go into recovered too
-        infected_active = np.sum(series[:, 3:6] + series[:, 15:18] + series[:, 6:9] + series[:, 9:12] + series[:, 18:21] + series[:, 21:24] + series[:, 24:27], axis = 1)
+    #     # also has E + XE for now because they go into recovered too
+    #     infected_active = np.sum(series[:, 3:6] + series[:, 15:18] + series[:, 6:9] + series[:, 9:12] + series[:, 18:21] + series[:, 21:24] + series[:, 24:27], axis = 1)
         
-        # if excluding E,Xe, can't compute infected_daily perfectly must settle with a 0.8 factor
-        # infected_active = np.sum(series[:, 6:9] + series[:, 9:12] + series[:, 18:21] + series[:, 21:24] + series[:, 24:27], axis = 1)
-        infected_daily = np.insert(np.diff(infected_active), 0 , infected_active[0])
-        infected_daily = infected_daily + recovered_daily + deads_daily
+    #     # if excluding E,Xe, can't compute infected_daily perfectly must settle with a 0.8 factor
+    #     # infected_active = np.sum(series[:, 6:9] + series[:, 9:12] + series[:, 18:21] + series[:, 21:24] + series[:, 24:27], axis = 1)
+    #     infected_daily = np.insert(np.diff(infected_active), 0 , infected_active[0])
+    #     infected_daily = infected_daily + recovered_daily + deads_daily
 
-        #print(deads_daily.shape, recovered_total.shape, recovered_daily.shape, infected_daily.shape)
+    #     #print(deads_daily.shape, recovered_total.shape, recovered_daily.shape, infected_daily.shape)
         
 
 
