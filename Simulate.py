@@ -124,7 +124,7 @@ if __name__ == "__main__" :
 
     with open('./Data/beta.json') as fd : 
         betas = json.load(fd)
-    print(betas)
+    
     transportMatrix = np.loadtxt('./Data/transportMatrix.csv', delimiter=',')
     statePop  = [getStatePop(s) for s in Model.STATES]
     mortality = [0.01 * getAgeMortality(s) for s in Model.STATES]
@@ -147,7 +147,7 @@ if __name__ == "__main__" :
         lastSeries.append(series[-1])
         seriesOfVariances.append(variances[0:-1])
         lastVariance.append(variances[-1])
-        Plot.statePlot(series, variances, state, ks.startDate, 7, datum, population = nbar.sum())
+        #Plot.statePlot(series, variances, state, ks.startDate, 7, datum, population = nbar.sum())
 
     x0 = np.hstack(lastSeries)
     n = x0.size
@@ -161,7 +161,7 @@ if __name__ == "__main__" :
     R = lambda t : np.array([])
     Z = lambda t : np.array([])
     tStart = model.lockdownEnd
-    tEnd = Date('15 Aug')
+    tEnd = Date('31 May')
 
     newSeries, newVariances = extendedKalmanFilter(model.dx, x0, P0, Q, H, R, Z, tStart, tEnd)
 

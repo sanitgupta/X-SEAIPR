@@ -30,7 +30,7 @@ class DateIter () :
 
 def getAllPlaces(directory = "Data/time_series"):
     ignorePlaces = set(['TOTAL'])
-    allPlaces = [x.replace(".csv", "").strip().upper() for x in os.listdir(directory) if x[-4:] == ".csv"]
+    allPlaces = [x.replace(".csv", "").strip() for x in os.listdir(directory) if x[-4:] == ".csv"]
     allPlaces = [x for x in allPlaces if x not in ignorePlaces]
     return allPlaces
 
