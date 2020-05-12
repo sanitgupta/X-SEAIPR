@@ -93,8 +93,13 @@ def statePlot (series, variances, state, beginDate, step, groundTruth,population
         while index < len(p) and p[index] < threshold * population:
             index += 1
         if index < len(p):
+        	# Find when it ends (if at all) - Note that right now I am not handling the case where you shut down and then
+        	# you start again...
+        	shutIndex = index
+        	while shutIndex < len(p) and p[shutIndex] > threshold * population:
+        		shutIndex += 1
             # Shade
-            ax1.fill_between(np.arange(index, T), 0, max(symptomatics + symptomatics_std) * 1.1 * 100./population, facecolor = colors[2], alpha=0.1)
+            ax1.fill_between(np.arange(index, shutIndex), 0, max(symptomatics + symptomatics_std) * 1.1 * 100./population, facecolor = colors[2], alpha=0.1)
 
     ax1.scatter(np.arange(0), [], c= colors[2], label = "Reported Positive")
 
