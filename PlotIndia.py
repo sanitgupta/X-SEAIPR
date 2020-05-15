@@ -123,7 +123,7 @@ class KalmanSimulator () :
                 self.startDate, endDate)
         return series, variances
 
-def getDeaths(dataDir, plot_start_date = Date('14 Mar')): 
+def getInfections(dataDir, plot_start_date = Date('14 Mar')): 
     data_end_date = None
     with open('./Data/beta.json') as fd : 
         betas = json.load(fd)
@@ -147,48 +147,32 @@ def getDeaths(dataDir, plot_start_date = Date('14 Mar')):
 
     state_id = 1
     total_population = 0
-    allDeaths, allPopulations = [], []
     for m, datum, series, variance ,state, population in zip(model.models, data, seriesOfSeries, seriesOfVariances, Model.STATES, statePop) : 
         ks = KalmanSimulator(datum, m, x0)
         total_population += population.sum()
-        allPopulations.append(population.sum())
         
-        # recovered_total = np.sum(series[:, 27:30], axis = 1)
-        recovered_total = series[:, 27:30]
-        recovered_daily = np.zeros_like(recovered_total)
-        recovered_daily[0, :] = recovered_total[0, :]
-        for i in range(1, len(recovered_total)):
-            recovered_daily[i, :] = recovered_total[i, :] - recovered_total[i - 1, :]
-        
-        # also has E + XE for now because they go into recovered too
-        # infected_active = np.sum(series[:, 3:6] + series[:, 15:18] + series[:, 6:9] + series[:, 9:12] + series[:, 18:21] + series[:, 21:24] + series[:, 24:27], axis = 1)
-        infected_active = series[:, 3:6] + series[:, 15:18] + series[:, 6:9] + series[:, 9:12] + series[:, 18:21] + series[:, 21:24] + series[:, 24:27]
-        
-        infected_daily = np.zeros_like(infected_active)
-        infected_daily[0, :] = infected_active[0, :]
-        for i in range(1, len(infected_daily)):
-            infected_daily[i, :] = infected_active[i, :] - infected_active[i - 1, :]
-        infected_daily = infected_daily + recovered_daily
-
-        deads_daily = np.sum(getAgeMortality(state) * 0.01 * infected_daily, axis = 1)
-        # deads_daily = deads_daily[:-17]
-        deads_daily = np.concatenate([np.zeros(17), deads_daily])
-        deads_total = np.cumsum(deads_daily)
-
+        T = len(series)
+        compartments = {k: [3*i, 3*i + 1, 3*i + 2] for i, k in enumerate(['S', 'E', 'A', 'I', 'Xs', 'Xe', 'Xa', 'Xi', 'P', 'R'])}
+        p, p_std = gather(T, series, variance, compartments['P'])
+        symptomatics, symptomatics_std = gather(T, series, variance, compartments['P'] + compartments['I'] + compartments['Xi'] + compartments['A'] + compartments['Xa'])
+    
         if data_end_date is None:
-            data_end_date = ks.startDate + deads_daily.shape[0]
-            total_deaths = np.zeros((data_end_date - plot_start_date))
-            total_deaths += deads_daily[len(deads_daily) -len(total_deaths):]
-            allDeaths.append(deads_daily[len(deads_daily)-len(total_deaths):])
+            data_end_date = ks.startDate + len(p)
+            total_p = np.zeros((data_end_date - plot_start_date))
+            total_symptomatics = np.zeros((data_end_date - plot_start_date))
+            total_p += p[len(p) - len(total_p):]
+            total_symptomatics += symptomatics[len(p) - len(total_symptomatics):]
         else:
-            assert data_end_date.date == (ks.startDate + deads_daily.shape[0]).date, "Inconsistency in the data - all simulations not ending at the same date"
-            if len(deads_daily) < len(total_deaths):
-                deads_daily = np.concatenate([np.zeros(- len(deads_daily) + len(total_deaths)), deads_daily])
-            total_deaths += deads_daily[len(deads_daily)-len(total_deaths):]
-            allDeaths.append(deads_daily[len(deads_daily)-len(total_deaths):])
+            assert data_end_date.date == (ks.startDate + len(p)).date, "Inconsistency in the data - all simulations not ending at the same date"
+            assert data_end_date.date == (ks.startDate + len(symptomatics)).date, "Inconsistency in the data - all simulations not ending at the same date"
+            if len(p) < len(total_p):
+                p = np.concatenate([np.zeros(- len(p) + len(total_p)), p])
+                symptomatics = np.concatenate([np.zeros(- len(symptomatics) + len(total_symptomatics)), symptomatics])
+            total_p += p[len(p) - len(total_p):]
+            total_symptomatics += symptomatics[len(p) - len(total_symptomatics):]
 
         state_id = state_id + 1
-    return total_deaths, total_population, allDeaths, allPopulations
+    return total_p, total_symptomatics, total_population
 
 def gather(T, series, variances, indices):
     outputSeries = [sum(x[index] for index in indices) for x in series]
@@ -196,8 +180,17 @@ def gather(T, series, variances, indices):
     outputVariances = [np.sqrt(x) for x in outputVariances]
     return np.array(outputSeries), np.array(outputVariances)
 
-def plot (base_deaths, intervention1_deaths, intervention2_deaths, beginDate, step,population = None, state = "India") : 
-    T = len(base_deaths)
+def plot (
+        base,
+        intervention1,
+        intervention2,
+        beginDate,
+        step,
+        plot_of,
+        population = None,
+        state = "India"
+    ) : 
+    T = len(base_p)
     # Define a closure function to register as a callback
     
     def convert_fraction_to_number(axis):
@@ -233,15 +226,15 @@ def plot (base_deaths, intervention1_deaths, intervention2_deaths, beginDate, st
         rightAxis.yaxis.set_major_formatter(formatter)
         ax1.callbacks.connect("ylim_changed", convert_fraction_to_number)
 
-    fig.suptitle(state + ": Predicted Deaths", fontsize=25)
+    fig.suptitle(state + ": " + plot_of, fontsize=25)
     
-    ax1.plot(np.arange(T), base_deaths * 100. / population, color = colors[0], label = "No Intervention")
+    ax1.plot(np.arange(T), base * 100. / population, color = colors[0], label = "No Intervention")
     # ax1.fill_between(np.arange(T), np.maximum(p - p_std, 0) * 100. / population, (p + p_std) * 100. / population, facecolor = colors[0], alpha=0.2)
     
-    ax1.plot(np.arange(T), intervention1_deaths * 100. / population, color = colors[1], label = "Intervention 1")
+    ax1.plot(np.arange(T), intervention1 * 100. / population, color = colors[1], label = "Intervention 1")
     # ax1.fill_between(np.arange(T), np.maximum(symptomatics - symptomatics_std, 0) * 100. / population, (symptomatics + symptomatics_std) * 100. / population , facecolor = colors[1], alpha=0.2)
 
-    ax1.plot(np.arange(T), intervention2_deaths * 100. / population, color = colors[2], label = "Intervention 2")
+    ax1.plot(np.arange(T), intervention2 * 100. / population, color = colors[2], label = "Intervention 2")
     # ax1.fill_between(np.arange(T), np.maximum(symptomatics - symptomatics_std, 0) * 100. / population, (symptomatics + symptomatics_std) * 100. / population , facecolor = colors[1], alpha=0.2)
     
     # ax1.scatter(np.arange(0), [], c= colors[2], label = "Reported Positive")
@@ -289,31 +282,31 @@ def plot (base_deaths, intervention1_deaths, intervention2_deaths, beginDate, st
     # ax2.tick_params(axis='both', which='major', labelsize=18)
 
     plt.gcf().subplots_adjust(bottom=0.2)
-    fig.savefig('./Plots/deaths/' + state.upper())
+    fig.savefig('./Plots/master/' + state.upper() + '_' + plot_of.replace(" ", "_").lower())
     plt.close(fig)
     plt.clf()
 
 if __name__ == "__main__":
-    base_deaths, total_population, state_base_deaths, state_populations = getDeaths('/Users/sahil/Desktop/sem8/covid/blossomRuns/base/', plot_start_date = Date('1 Apr'))
-    intervention1_deaths, _, state_intervention1_deaths, _ = getDeaths('/Users/sahil/Desktop/sem8/covid/blossomRuns/intervention1/', plot_start_date = Date('1 Apr'))
-    intervention2_deaths, _, state_intervention2_deaths, _ = getDeaths('/Users/sahil/Desktop/sem8/covid/blossomRuns/intervention2/', plot_start_date = Date("1 Apr"))
+    base_p, base_symptomatics, total_population= getInfections('/Users/sahil/Desktop/sem8/covid/blossomRuns/base/', plot_start_date = Date('1 Apr'))
+    intervention1_p, intervention1_symptomatics, _ = getInfections('/Users/sahil/Desktop/sem8/covid/blossomRuns/intervention1/', plot_start_date = Date('1 Apr'))
+    intervention2_p, intervention2_symptomatics, _ = getInfections('/Users/sahil/Desktop/sem8/covid/blossomRuns/intervention2/', plot_start_date = Date("1 Apr"))
+    print(list(zip(base_p, base_symptomatics)))
     plot(
-        base_deaths = base_deaths,
-        intervention1_deaths = intervention1_deaths,
-        intervention2_deaths = intervention2_deaths,
+        base = base_p,
+        intervention1 = intervention1_p,
+        intervention2 = intervention2_p,
+        plot_of = "Tested Positive",
         beginDate = Date('1 Apr'),
         step = 7,
         population = total_population
     )
-    for single_base_deaths, single_intervention1_deaths, single_intervention2_deaths, single_population, state_name in \
-    zip(state_base_deaths, state_intervention1_deaths, state_intervention2_deaths, state_populations, Model.STATES):
-        plot(
-        base_deaths = single_base_deaths,
-        intervention1_deaths = single_intervention1_deaths,
-        intervention2_deaths = single_intervention2_deaths,
+    plot(
+        base = base_symptomatics,
+        intervention1 = intervention1_symptomatics,
+        intervention2 = intervention2_symptomatics,
+        plot_of = "Total Infected",
         beginDate = Date('1 Apr'),
         step = 7,
-        population = single_population,
-        state = state_name
+        population = total_population
     )
 
