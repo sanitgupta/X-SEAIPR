@@ -162,7 +162,7 @@ if __name__ == "__main__" :
     R = lambda t : np.array([])
     Z = lambda t : np.array([])
     tStart = model.lockdownEnd
-    tEnd = Date('15 May')
+    tEnd = Date('10 May')
 
     newSeries, newVariances = extendedKalmanFilter(model.dx, x0, P0, Q, H, R, Z, tStart, tEnd)
 

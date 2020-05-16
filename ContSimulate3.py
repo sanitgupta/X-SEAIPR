@@ -137,10 +137,10 @@ if __name__ == "__main__" :
     seriesOfVariances = []
     lastVariance = []
 
-    with open('series.pkl', 'rb') as fd : 
+    with open('series2.pkl', 'rb') as fd : 
         seriesOfSeries = pickle.load(fd)
 
-    with open('var.pkl', 'rb') as fd : 
+    with open('var2.pkl', 'rb') as fd : 
         seriesOfVariances = pickle.load(fd)
 
     for i in range(len(seriesOfSeries)):
@@ -169,7 +169,7 @@ if __name__ == "__main__" :
 
 
 
-    tStart = Date('16 May') # wherever the previous simulation ended + 1
+    tStart = Date('26 May') # wherever the previous simulation ended + 1
     tEnd = Date('31 May')   # whenever you want to run the simulation till
 
 
@@ -189,8 +189,8 @@ if __name__ == "__main__" :
         seriesOfSeries[i] = np.vstack((seriesOfSeries[i], newSeries[i].T))
         seriesOfVariances[i].extend(newVariances[i])
 
-    with open('contseries.pkl', 'wb') as fd : 
+    with open('series3.pkl', 'wb') as fd : 
         pickle.dump(seriesOfSeries, fd)
 
-    with open('contvar.pkl', 'wb') as fd : 
+    with open('var3.pkl', 'wb') as fd : 
         pickle.dump(seriesOfVariances, fd)
