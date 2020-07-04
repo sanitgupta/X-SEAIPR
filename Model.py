@@ -23,6 +23,8 @@ STATES.sort()
 class IndiaModel () : 
 
     def __init__ (self, transportMatrix, betas, statePop, mortality, data) : 
+
+        ## one can modify transportation here
         self.transportMatrix = transportMatrix
         self.betas = betas
         self.statePop = statePop
@@ -95,7 +97,7 @@ class IndiaModel () :
             else : 
                 startDate = firstCases
 
-            ## the dates on which the lockdown, contact reduction and heightened testing begin/end
+            ## the dates on which the lockdown, contact reduction and the increase in testing begin/end
 
             lockdownBegin = Date('24 Mar')
             lockdownEnd = self.lockdownEnd
