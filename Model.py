@@ -95,6 +95,8 @@ class IndiaModel () :
             else : 
                 startDate = firstCases
 
+            ## the dates on which the lockdown, contact reduction and heightened testing begin/end
+
             lockdownBegin = Date('24 Mar')
             lockdownEnd = self.lockdownEnd
 
@@ -111,6 +113,8 @@ class IndiaModel () :
             deltaKt  = 10
 
             beta, lockdownLeakiness, tf1, tf2, tf3  = self.betas[state]
+
+            ## various parameters of the model that can be changed
 
             params = {
                 'tl'                : lockdownBegin, 
@@ -277,7 +281,7 @@ class SpaxireAgeStratified () :
         module : whether to use torch or numpy
         """
         t = startDate + int(delta_t)
-        #print("Model Date: "+str(t.date))
+
 
         s, e, a, i, xs, xe, xa, xi, p, r = x.reshape((-1, self.bins))
 
@@ -290,6 +294,11 @@ class SpaxireAgeStratified () :
             ct = self.contactTotal(t)
             ch = self.contactHome(t)
             cs = self.contactSchool
+
+
+        ## here, one can introduce conditional interventions like dynamic lockdown 
+        ## where a state would automaticall go into lockdown when the 
+        ## of people positive crosses a certain threshold
 
         self.Nbar = s + e + a + i + xs + xe + xa + xi + p + r
 
