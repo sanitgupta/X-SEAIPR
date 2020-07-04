@@ -17,7 +17,22 @@ To run the model:
 >> python Simulate.py
 ```
 
-If you wish to run the model for a particular state, instead of India, replace all the files (time series case data, age-wise population data, transportation data) in the Data folder.
+You will now have the results saved in .pkl files.
 
+To generate the plots for each state/district after having run the model:
 
-A more comprehensive guide coming soon!
+```bash
+>> python PlotNew.py
+```
+
+You will now have the plots saved in the Plots folder.
+
+If one wishes to run the model for a particular state (or for India but with newer data), instead of India, one has to replace the data files (time series case data, age-wise population data, transportation data) in the Data folder.
+
+Further, changes can be made to Model.py and Simulate.py to run various other scenarios.
+
+One can edit the params dict in Model.py to change the lockdown dates, to change the dates for which contact reduction is done, to change the amount of contact reduction and to change the date on which testing gets ramped up.
+
+To add more adaptive interventions, for example dynamic lockdowns where a state would shut down once a certain number of cases is reached, one must edit the dx function in Model.py. 
+
+To use one's own estimates of the testing fraction, one can edit the beta.json file in the Data folder.
