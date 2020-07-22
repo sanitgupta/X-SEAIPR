@@ -1,6 +1,6 @@
 from Util import *
 import pickle
-# import Plot
+#import Plot
 from EKF import *
 import json
 import Model
@@ -141,13 +141,14 @@ if __name__ == "__main__" :
         nbar[1] -= 30
         x0 = np.array([*(nbar.tolist()), *E0, *A0, *I0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
         ks = KalmanSimulator(datum, m, x0)
+        print(state)
         series, variances = ks(model.lockdownEnd - ks.startDate)
         #pdb.set_trace()
         seriesOfSeries.append(series[0:-1])
         lastSeries.append(series[-1])
         seriesOfVariances.append(variances[0:-1])
         lastVariance.append(variances[-1])
-        # Plot.statePlot(series, variances, state, ks.startDate, 7, datum, population = nbar.sum())
+        #Plot.statePlot(series, variances, state, ks.startDate, 7, datum, population = nbar.sum())
 
     x0 = np.hstack(lastSeries)
     n = x0.size
@@ -161,6 +162,8 @@ if __name__ == "__main__" :
     R = lambda t : np.array([])
     Z = lambda t : np.array([])
     tStart = model.lockdownEnd
+
+    ## the end date of the simulation
     tEnd = Date('10 May')
 
     newSeries, newVariances = extendedKalmanFilter(model.dx, x0, P0, Q, H, R, Z, tStart, tEnd)

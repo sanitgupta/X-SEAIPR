@@ -6,34 +6,25 @@ from more_itertools import collapse
 from itertools import product
 from functools import partial
 import torch
-import matplotlib.pyplot as plt
+# import matplotlib
+# matplotlib.use('Agg')
+# from matplotlib import pyplot as plt
 import numpy as np
 from Simulate import *
 from copy import deepcopy
-from Plot import * 
+# from Plot import * 
 import pdb
 
 cat = {np : np.hstack, torch : torch.cat}
 
-STATES = ['ANDAMAN&NICOBAR','ANDHRAPRADESH','ARUNACHALPRADESH',
-        'ASSAM','BIHAR','CHANDIGARH',
-        'CHHATTISGARH','DADRA&NAGARHAVELI','DAMAN&DIU',
-        'GOA','GUJARAT','HARYANA',
-        'HIMACHALPRADESH','JAMMU&KASHMIR','JHARKHAND',
-        'KARNATAKA','KERALA','LADAK',
-        'LAKSHADWEEP','MADHYAPRADESH','MAHARASHTRA',
-        'MANIPUR','MEGHALAYA','MIZORAM',
-        'NCTOFDELHI','NAGALAND','ODISHA',
-        'PUDUCHERRY','PUNJAB','RAJASTHAN',
-        'SIKKIM','TAMILNADU','TELANGANA',
-        'TRIPURA','UTTARPRADESH','UTTARAKHAND','WESTBENGAL']
-
-# STATES = getAllPlaces()
-# STATES.sort()
+STATES = getAllPlaces()
+STATES.sort()
 
 class IndiaModel () : 
 
     def __init__ (self, transportMatrix, betas, statePop, mortality, data) : 
+
+        ## one can modify transportation here
         self.transportMatrix = transportMatrix
         self.betas = betas
         self.statePop = statePop
@@ -106,6 +97,8 @@ class IndiaModel () :
             else : 
                 startDate = firstCases
 
+            ## the dates on which the lockdown, contact reduction and the increase in testing begin/end
+
             lockdownBegin = Date('24 Mar')
             lockdownEnd = self.lockdownEnd
 
@@ -122,6 +115,8 @@ class IndiaModel () :
             deltaKt  = 10
 
             beta, lockdownLeakiness, tf1, tf2, tf3  = self.betas[state]
+
+            ## various parameters of the model that can be changed
 
             params = {
                 'tl'                : lockdownBegin, 
@@ -302,6 +297,10 @@ class SpaxireAgeStratified () :
             ch = self.contactHome(t)
             cs = self.contactSchool
 
+        ## here, one can introduce conditional interventions like dynamic lockdown 
+        ## where a state would automaticall go into lockdown when the 
+        ## of people positive crosses a certain threshold
+
         self.Nbar = s + e + a + i + xs + xe + xa + xi + p + r
 
         b3 = 0.002 * self.lockdownLeakiness
@@ -322,9 +321,7 @@ class SpaxireAgeStratified () :
         lambdaLockdown = module.sum(self.beta * current, axis=1)
 
 
-        #print("**********************************************")
         # testing rates for presymptomatics, symptomatics and asymptomatics respectively
-        #print(self.testingFraction1)
         testFrac1 = 3 * self.testingFraction1(t) / 8
         testFrac2 = 5 * self.testingFraction1(t) / (8 - 3 * self.testingFraction1(t))
         testFrac3 = self.testingFraction3(t)

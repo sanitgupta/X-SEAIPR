@@ -137,6 +137,10 @@ if __name__ == "__main__" :
     mortality = [0.01 * getAgeMortality(s) for s in Model.STATES]
     data = [getData(s) for s in Model.STATES]
     
+
+
+    ## for intervention 1 mentioned in the paper, where the testing of different states is ramped up to diffrent amounts
+
     ###################################################### VARIABLES FOR INTERVENTION 1 ###############################################################
     _, oldTestingFractions = getBetaAndTestingFractions("Data/beta.csv")
     topStates = ["MIZORAM","KERALA","PUNJAB","TAMILNADU","GUJARAT","HIMACHALPRADESH","LAKSHADWEEP","MAHARASHTRA","KARNATAKA","ANDHRAPRADESH","WESTBENGAL","JAMMU&KASHMIR","LADAK"]
